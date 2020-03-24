@@ -476,22 +476,54 @@ module BlackStack
       end
     end
     
-    # New call_post
-    def self.call_post(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE)
-      uri = URI(url)
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => ssl_verify_mode) do |http|
-        req = Net::HTTP::Post.new(uri)
-        req['Content-Type'] = 'application/json'
-        req.set_form_data(params)
-        #req.body = body if !body.nil?
-        res = http.request req
-        case res 
-        when Net::HTTPSuccess then res
-        when Net::HTTPRedirection then BlackStack::Netting::call_post(URI(res['location']), params)
-        else
-          res.error!
+    # Call the API and return th result.
+    # url: valid internet address
+    # params: hash of params to attach in the call
+    # ssl_verify_mode: you can disabele SSL verification here. 
+    # max_channels: this method use lockfiles to prevent an excesive number of API calls from each datacenter. There is not allowed more simultaneous calls than max_channels.
+    # TODO: setup max_simultaneus_calls in the configurtion file.
+    def self.call_post(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, max_channels=10)
+      # build the lockfile name
+      x = rand(max_channels.to_i)
+      lockfilename = "./apicall.channel_#{x.to_s}.lock"  
+      lockfile = File.open(lockfilename, "w")
+
+      # lock the file
+      lockfile.flock(File::LOCK_EX)
+      
+      begin
+        
+        # do the call
+        uri = URI(url)
+        ret = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => ssl_verify_mode) do |http|
+          req = Net::HTTP::Post.new(uri)
+          req['Content-Type'] = 'application/json'
+          req.set_form_data(params)
+          #req.body = body if !body.nil?
+          res = http.request req
+          case res 
+          when Net::HTTPSuccess then res
+          when Net::HTTPRedirection then BlackStack::Netting::call_post(URI(res['location']), params)
+          else
+            res.error!
+          end
         end
+        
+        # release the file
+        lockfile.flock(File::LOCK_UN)
+      rescue => e
+        # release the file
+        lockfile.flock(File::LOCK_UN)
+        
+        # elevo la excepcion
+        raise e
+      ensure
+        # release the file
+        lockfile.flock(File::LOCK_UN)
       end
+      
+      # return 
+      ret
     end
 
     # 
