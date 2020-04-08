@@ -447,6 +447,30 @@ module BlackStack
     DEFAULT_SSL_VERIFY_MODE = OpenSSL::SSL::VERIFY_NONE
     SUCCESS = 'success'
     
+    @@lockfiles = []   
+
+    @@max_api_call_channels = 0 # 0 means infinite
+    
+    def self.max_api_call_channels()
+      @@max_api_call_channels
+    end
+
+    def self.lockfiles()
+      @@lockfiles
+    end
+
+    def self.set(h)
+      @@max_api_call_channels = h[:max_api_call_channels]
+      @@lockfiles = []
+      
+      i = 0
+      while i<@@max_api_call_channels
+        @@lockfiles << File.open("./apicall.channel_#{i.to_s}.lock", "w")
+        i+=1
+      end
+    end
+
+
     class ApiCallException < StandardError
       attr_accessor :description
       
@@ -482,15 +506,16 @@ module BlackStack
     # ssl_verify_mode: you can disabele SSL verification here. 
     # max_channels: this method use lockfiles to prevent an excesive number of API calls from each datacenter. There is not allowed more simultaneous calls than max_channels.
     # TODO: setup max_simultaneus_calls in the configurtion file.
-    def self.call_post(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, max_channels=10)
+    def self.call_post(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, use_lockfile=true)
       # build the lockfile name
-      x = rand(max_channels.to_i)
-      lockfilename = "./apicall.channel_#{x.to_s}.lock"  
-      lockfile = File.open(lockfilename, "w")
-
-      # lock the file
-      lockfile.flock(File::LOCK_EX)
-      
+      x = 0
+      if BlackStack::Netting.max_api_call_channels.to_i > 0
+        raise "Max Channels cannot be higher than #{BlackStack::Netting.lockfiles.size.to_s}" if BlackStack::Netting.max_api_call_channels > BlackStack::Netting.lockfiles.size
+        x = rand(BlackStack::Netting.max_api_call_channels)
+        # lock the file
+        BlackStack::Netting.lockfiles[x].flock(File::LOCK_EX) if use_lockfile
+      end
+            
       begin
         
         # do the call
@@ -503,23 +528,23 @@ module BlackStack
           res = http.request req
           case res 
           when Net::HTTPSuccess then res
-          when Net::HTTPRedirection then BlackStack::Netting::call_post(URI(res['location']), params)
+          when Net::HTTPRedirection then BlackStack::Netting::call_post(URI(res['location']), params, BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, false)
           else
             res.error!
           end
         end
         
         # release the file
-        lockfile.flock(File::LOCK_UN)
+        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
       rescue => e
         # release the file
-        lockfile.flock(File::LOCK_UN)
+        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
         
         # elevo la excepcion
         raise e
       ensure
         # release the file
-        lockfile.flock(File::LOCK_UN)
+        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
       end
       
       # return 
