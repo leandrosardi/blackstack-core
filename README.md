@@ -580,6 +580,17 @@ Minutes '1500'.to_time_spent... 1 days, 1 hours
 Minutes '1501'.to_time_spent... 1 days, 1 hours
 ```
 
+### OCRA Supporting Functions
+
+OCRA files run into a temp folder, where the script is unpacked.
+This function is useful to require a configuration file when the script is running inside an OCRA temp folder, since the local folder of the running command is not the folder where the exe file is hosted.
+More information: https://stackoverflow.com/questions/1937743/how-to-get-the-current-working-directorys-absolute-path-from-irb
+
+```ruby
+require 'blackstack_commons'
+BlackStack::OCRA::require_in_working_path 'config.rb'
+```
+
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the last [ruby gem](https://rubygems.org/gems/simple_command_line_parser). 

@@ -1,4 +1,28 @@
+
 module BlackStack
+
+  # ----------------------------------------------------------------------------------------- 
+  # OCRA Supporting Functions
+  # ----------------------------------------------------------------------------------------- 
+  module OCRA
+		# OCRA files run into a temp folder, where the script is unpacked.
+		# 
+		# This function is useful to require a configuration file when the
+		# script is running inside an OCRA temp folder, since the local folder
+		# of the running command is not the filder where the exe file is hosted.
+		# 
+		# More information: https://stackoverflow.com/questions/1937743/how-to-get-the-current-working-directorys-absolute-path-from-irb
+		# 
+		def self.require_in_working_path(filename, show_path_info=false)
+			puts '' if show_path_info
+			path = File.expand_path File.dirname(__FILE__)
+			puts "require_in_working_path.path:#{path}:." if show_path_info
+			file = "#{path}/#{filename}"
+			puts "require_in_working_path.file:#{file}:." if show_path_info
+			require file
+		end
+	end # module OCRA
+
   # ----------------------------------------------------------------------------------------- 
   # DateTime Functions
   # ----------------------------------------------------------------------------------------- 
