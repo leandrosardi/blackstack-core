@@ -15,7 +15,8 @@ module BlackStack
 		# 
 		def self.require_in_working_path(filename, show_path_info=false)
 			puts '' if show_path_info
-			path = File.expand_path File.dirname(__FILE__)
+			#path = File.expand_path File.dirname(__FILE__)
+			path = Dir.pwd
 			puts "require_in_working_path.path:#{path}:." if show_path_info
 			file = "#{path}/#{filename}"
 			puts "require_in_working_path.file:#{file}:." if show_path_info
