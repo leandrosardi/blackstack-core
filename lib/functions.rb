@@ -11,9 +11,12 @@ module BlackStack
 		# script is running inside an OCRA temp folder, since the local folder
 		# of the running command is not the filder where the exe file is hosted.
 		# 
-		# More information: https://stackoverflow.com/questions/1937743/how-to-get-the-current-working-directorys-absolute-path-from-irb
+		# More information: 
+		#	* https://stackoverflow.com/questions/1937743/how-to-get-the-current-working-directorys-absolute-path-from-irb
+		# * https://stackoverflow.com/questions/8577223/ruby-get-the-file-being-executed
+		# * https://stackoverflow.com/questions/7399882/ruby-getting-path-from-pathfilename/7400057
 		# 
-		def self.require_in_working_path(filename, path=__FILE__,show_path_info=false)
+		def self.require_in_working_path(filename, path, show_path_info=false)
 			puts '' if show_path_info
 			path = File.expand_path File.dirname(path)
 			#path = Dir.pwd
