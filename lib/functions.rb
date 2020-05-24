@@ -13,10 +13,10 @@ module BlackStack
 		# 
 		# More information: https://stackoverflow.com/questions/1937743/how-to-get-the-current-working-directorys-absolute-path-from-irb
 		# 
-		def self.require_in_working_path(filename, show_path_info=false)
+		def self.require_in_working_path(filename, path=__FILE__,show_path_info=false)
 			puts '' if show_path_info
-			#path = File.expand_path File.dirname(__FILE__)
-			path = Dir.pwd
+			path = File.expand_path File.dirname(path)
+			#path = Dir.pwd
 			puts "require_in_working_path.path:#{path}:." if show_path_info
 			file = "#{path}/#{filename}"
 			puts "require_in_working_path.file:#{file}:." if show_path_info

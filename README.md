@@ -588,7 +588,7 @@ More information: https://stackoverflow.com/questions/1937743/how-to-get-the-cur
 
 ```ruby
 require 'blackstack_commons'
-BlackStack::OCRA::require_in_working_path 'config.rb'
+BlackStack::OCRA::require_in_working_path 'config.rb', __FILE__
 ```
 
 ## Versioning
