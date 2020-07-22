@@ -535,6 +535,7 @@ module BlackStack
     # max_channels: this method use lockfiles to prevent an excesive number of API calls from each datacenter. There is not allowed more simultaneous calls than max_channels.
     # TODO: setup max_simultaneus_calls in the configurtion file.
     def self.call_post(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, use_lockfile=true)
+=begin
       # build the lockfile name
       x = 0
       if BlackStack::Netting.max_api_call_channels.to_i > 0
@@ -543,7 +544,7 @@ module BlackStack
         # lock the file
         BlackStack::Netting.lockfiles[x].flock(File::LOCK_EX) if use_lockfile
       end
-            
+=end
       begin
         
         # do the call
@@ -563,16 +564,16 @@ module BlackStack
         end
         
         # release the file
-        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
+#        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
       rescue => e
         # release the file
-        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
+#        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
         
         # elevo la excepcion
         raise e
       ensure
         # release the file
-        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
+#        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
       end
       
       # return 
