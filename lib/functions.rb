@@ -246,7 +246,7 @@ module BlackStack
       # units: it is a positive integer  
       def self.encode_period(period, units)
         s = "Last "
-        s += units.to_s + " " if units.to_i > 1
+        s += units.to_i.to_s + " " if units.to_i > 1
         s += "Hours" if period.upcase == "H" && units.to_i != 1
         s += "Days" if period.upcase == "D" && units.to_i != 1
         s += "Weeks" if period.upcase == "W" && units.to_i != 1
@@ -512,7 +512,7 @@ module BlackStack
     end
     
     # New call_get
-    def self.call_get(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE) 
+    def self.call_get(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, support_redirections=true) 
       uri = URI(url)
       uri.query = URI.encode_www_form(params)
       Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => ssl_verify_mode) do |http|
@@ -521,7 +521,7 @@ module BlackStack
         res = http.request req
         case res
         when Net::HTTPSuccess then res
-        when Net::HTTPRedirection then BlackStack::Netting::call_get(URI(res['location']), params)
+        when Net::HTTPRedirection then BlackStack::Netting::call_get(URI(res['location']), params, false) if support_redirections
         else
           res.error!
         end
@@ -534,7 +534,7 @@ module BlackStack
     # ssl_verify_mode: you can disabele SSL verification here. 
     # max_channels: this method use lockfiles to prevent an excesive number of API calls from each datacenter. There is not allowed more simultaneous calls than max_channels.
     # TODO: setup max_simultaneus_calls in the configurtion file.
-    def self.call_post(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, use_lockfile=true)
+    def self.call_post(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, support_redirections=true)
 =begin
       # build the lockfile name
       x = 0
@@ -546,7 +546,8 @@ module BlackStack
       end
 =end
       begin
-        
+#puts 
+#puts "call_post:#{url}:."
         # do the call
         uri = URI(url)
         ret = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => ssl_verify_mode) do |http|
@@ -557,7 +558,7 @@ module BlackStack
           res = http.request req
           case res 
           when Net::HTTPSuccess then res
-          when Net::HTTPRedirection then BlackStack::Netting::call_post(URI(res['location']), params, BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, false)
+          when Net::HTTPRedirection then BlackStack::Netting::call_post(URI(res['location']), params, BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, false) if support_redirections
           else
             res.error!
           end
