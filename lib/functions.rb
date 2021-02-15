@@ -120,7 +120,7 @@ module BlackStack
     MATCH_PASSWORD                = /(?=.*[a-zA-Z])(?=.*[0-9]).{6,}/ 
     MATCH_GUID                    = /{?[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]\-[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]\-[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]-[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]\-[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]}?/
     MATCH_FILENAME                = /[\w\-\_\.]+/
-    MATCH_EMAIL                   = /[A-Z0-9._%a-z\-]+@(?:[A-Z0-9a-z\-]+\.)+[A-Za-z]{2,4}/
+    MATCH_EMAIL                   = /[A-Z0-9._%a-z\-]+@(?:[A-Z0-9a-z\-]+\.)+[A-Za-z]{1,25}/
     MATCH_DOMAIN                  = /(?:[A-Z0-9a-z\-]+\.)+[A-Za-z]{2,4}/
     MATCH_DATE_STANDARD           = /\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])/
     MATCH_PHONE                   = /(?:\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/
