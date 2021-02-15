@@ -108,4 +108,13 @@ class String
     BlackStack::Strings::Encoding::encode_html(self.to_s)    
   end
   
+  # Escapes carriage returns and single and double quotes for JavaScript segments.
+  # reference: https://api.rubyonrails.org/classes/ActionView/Helpers/JavaScriptHelper.html
+  def escape_javascript
+    s = self.dup
+    js_escape_map = { '\\' => '\\\\', "</" => '<\/', "\r\n" => '\n', "\n" => '\n', "\r" => '\n', '"' => '\\"', "'" => "\\'", "`" => "\\`", "$" => "\\$" }
+    js_escape_map.each { | x, y | s.gsub!(x,y) }
+    s
+  end
+  
 end # class String
