@@ -110,11 +110,34 @@ class String
   
   # Escapes carriage returns and single and double quotes for JavaScript segments.
   # reference: https://api.rubyonrails.org/classes/ActionView/Helpers/JavaScriptHelper.html
+  #
+  # Example: 
+  # <%
+  # s = 'Hello World!'
+  # %>
+  # text = "<%=s.escape_javascript%>"
+  # 
+  # Never use single-quotation marks, because this method is not supporting it.
+  # <%
+  # s = 'Hello World!'
+  # %>
+  # text = '<%=s.escape_javascript%>'
+  # 
   def escape_javascript
     s = self.dup
-    js_escape_map = { '\\' => '\\\\', "</" => '<\/', "\r\n" => '\n', "\n" => '\n', "\r" => '\n', '"' => '\\"', "'" => "\\'", "`" => "\\`", "$" => "\\$" }
-    js_escape_map.each { | x, y | s.gsub!(x,y) }
-    s
+	  js_escape_map = { 
+      '\\' => '\\\\', 
+      "</" => '<\/', 
+      "\r\n" => '\n', 
+      "\n" => '\n', 
+      "\r" => '\n', 
+      '"' => '\\"', 
+      "'" => "\'", 
+      "`" => "\`", 
+      "$" => "\\$", 
+    }
+	  js_escape_map.each { | x, y | s.gsub!(x,y) }
+	  s
   end
   
 end # class String
