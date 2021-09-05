@@ -369,13 +369,15 @@ module BlackStack
             return false if n>1 # Opening spining char '{' inside another spining block.
           end  
         }
-      
+              
+        return false if n!=0
+        
         # obtengo cada uno de los spinnings
         s.scan(MATCH_CONTENT_SPINNING).each { |x|
           a = x.split('|')
           raise "No variations delimited by '|' inside spinning block." if a.size <= 1
         }
-      
+              
         true
       end
       
