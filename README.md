@@ -8,17 +8,38 @@ I ran tests in Windows environments only.
 
 Email to me if you want to collaborate, by testing this library in any Linux platform.
 
-### Installing
+## Installation
 
 ```
 gem install blackstack_commons
 ```
 
-## Running the tests
+## Break Points
 
-Here are some tests about how to use this gem properly.
+`BlackStack::Debugging.breakpoint` can be invoked in the middle of a running program. 
+It opens a Pry session at the point it's called and makes all program state at that point available. 
+When the session ends the program continues with any modifications you made to it.
 
-### Passwords Validation 
+`BlackStack::Debugging.breakpoint` is just calling the Pry's `binding.pry` method, but only if the @@allow_breakpoints is true.
+
+```ruby
+BlackStack::Debugging.set({
+  # activate this in your development environment only.
+  # never activate it in production.
+  :allow_breakpoints => true, # it is false by default
+})
+
+(1..100).each do |i|
+  BlackStack::Debugging.breakpoint
+  puts i
+end
+```
+
+The goal of using `BlackStack::Debugging.breakpoint` instead `binding.pry` is to keep the brakpoints in your source code being sure that they will work in your development environment only, by handling 2 differnet ruby configuration files (example: `config.dev.rb` and `config.prod.rb`)
+
+For more information about Pry, refere to this URL: [https://pry.github.io/](https://pry.github.io/)
+
+## Passwords Validation 
 
 ```ruby
 require 'blackstack_commons'
@@ -39,7 +60,7 @@ Passwords
 'HelloWorld12$3'.password?... true
 ```
 
-### GUIDs Validation
+## GUIDs Validation
 
 ```ruby
 require 'blackstack_commons'
@@ -69,7 +90,7 @@ GUIDs
 '331A92C35FE147A2A31BCFA439B5B4F9'.guid?... false
 ```
 
-### Filename Format Validation 
+## Filename Format Validation 
 
 ```ruby
 require 'blackstack_commons'
@@ -95,7 +116,7 @@ Filenames
 'filename.txt.rar'.filename?... false
 ```
 
-### Email Format Validation 
+## Email Format Validation 
 
 ```ruby
 require 'blackstack_commons'
@@ -123,7 +144,7 @@ Emails
 'tango@'.email?... false
 ```
 
-### Domain Name Format Validation 
+## Domain Name Format Validation 
 
 ```ruby
 require 'blackstack_commons'
@@ -161,7 +182,7 @@ Domains
 'https://www.expandedventure.com.ar'.domain?... true
 ```
 
-### Phone Number Format Validation 
+## Phone Number Format Validation 
 
 ```ruby
 require 'blackstack_commons'
@@ -197,7 +218,7 @@ Phone Numbers
 '+54-545-561-2148'.domain?... true
 ```
 
-### URL Format Validation 
+## URL Format Validation 
 
 ```ruby
 require 'blackstack_commons'
@@ -235,7 +256,7 @@ URLs
 'https://www.expandedventure.com.ar'.url?... true
 ```
 
-### Fixnum Format Validation 
+## Fixnum Format Validation 
 
 ```ruby
 require 'blackstack_commons'
@@ -267,7 +288,7 @@ Fixnums
 '5.000'.fixnum?... false
 ```
 
-### SQL Date-Time Format Validation 
+## SQL Date-Time Format Validation 
 
 ```ruby
 require 'blackstack_commons'
@@ -303,7 +324,7 @@ SQL DateTimes
 '2019-11-06 21:50:70'.sql_datetime?... false
 ```
 
-### BlackStack API Date-Time Format Validation
+## BlackStack API Date-Time Format Validation
 
 ```ruby
 require 'blackstack_commons'
@@ -339,7 +360,7 @@ API DateTimes
 '20191106215070'.api_datetime?... false
 ```
 
-### Convert SQL Date-Time Format String, to BlackStack's API Date-Time Format String
+## Convert SQL Date-Time Format String, to BlackStack's API Date-Time Format String
 
 ```ruby
 require 'blackstack_commons'
@@ -361,7 +382,7 @@ SQL DateTime -> API DateTime
 '2019-11-06 21:50:30'.sql_to_api_datetime... 20191106215030
 ```
 
-### Convert BlackStack's API Date-Time Format String, to SQL Date-Time Format String
+## Convert BlackStack's API Date-Time Format String, to SQL Date-Time Format String
 
 ```ruby
 require 'blackstack_commons'
@@ -383,7 +404,7 @@ API DateTime -> SQL DateTime
 '20191106215030'.api_to_sql_datetime... 2019-11-06 21:50:30
 ```
 
-### Convert SQL GUID to a Standard (Normalized) Format
+## Convert SQL GUID to a Standard (Normalized) Format
 
 ```ruby
 require 'blackstack_commons'
@@ -411,7 +432,7 @@ Any GUID -> Normalized Guid
 '331A92C3-5FE1-47A2-A31B-CFA439B5B4F9'.to_guid... 331A92C3-5FE1-47A2-A31B-CFA439B5B4F9
 ```
 
-### Escape String with Simple-Quotes to SQL Format
+## Escape String with Simple-Quotes to SQL Format
 
 ```ruby
 require 'blackstack_commons'
@@ -436,7 +457,7 @@ Any String -> String with Escaped Quotes
 'Hello World!'.to_sql... Hello World!
 ```
 
-### Check if String is a Valid Spintax
+## Check if String is a Valid Spintax
 
 ```ruby
 require 'blackstack_commons'
@@ -466,7 +487,7 @@ Spintax
 '{Hello|Hi World!'.spintax?... false
 ```
 
-### Get Sample Text from Spintax
+## Get Sample Text from Spintax
 
 ```ruby
 require 'blackstack_commons'
@@ -494,7 +515,7 @@ Spin
 '{Hello|Hi|Good Morning|Good Afternoon} World!'.spin... Good Morning World!
 ```
 
-### Convert Ruby Time Object to SQL Friendy Date-Time String
+## Convert Ruby Time Object to SQL Friendy Date-Time String
 
 ```ruby
 require 'blackstack_commons'
@@ -518,7 +539,7 @@ Time object -> SQL
 '2019-11-06T15:25:55+00:00'.to_sql... 2019-11-06 15:25:55
 ```
 
-### Convert Sting to HTML Friendy String
+## Convert Sting to HTML Friendy String
 
 ```ruby
 require 'blackstack_commons'
@@ -542,7 +563,7 @@ Fixnum & Floats -> Screen Friendly Text
 '64443.5454'.to_label... 64,443.5454
 ```
 
-### Convert FixNum Minutes to String with Description of Time Spent 
+## Convert FixNum Minutes to String with Description of Time Spent 
 
 ```ruby
 require 'blackstack_commons'
@@ -580,7 +601,7 @@ Minutes '1500'.to_time_spent... 1 days, 1 hours
 Minutes '1501'.to_time_spent... 1 days, 1 hours
 ```
 
-### OCRA Supporting Functions
+## OCRA Supporting Functions
 
 OCRA files run into a temp folder, where the script is unpacked.
 This function is useful to require a configuration file when the script is running inside an OCRA temp folder, since the local folder of the running command is not the folder where the exe file is hosted.
@@ -590,6 +611,8 @@ More information: https://stackoverflow.com/questions/1937743/how-to-get-the-cur
 require 'blackstack_commons'
 BlackStack::OCRA::require_in_working_path 'config.rb', ENV["OCRA_EXECUTABLE"] || __FILE__  
 ```
+
+#
 
 ## Versioning
 

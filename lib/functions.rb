@@ -2,6 +2,34 @@
 module BlackStack
 
   # ----------------------------------------------------------------------------------------- 
+  # PRY Supporting Functions
+  # ----------------------------------------------------------------------------------------- 
+  module Debugging
+    @@allow_breakpoints = false
+    
+    # return true if breakpoints are allowed
+    def self.allow_breakpoints
+      @@allow_breakpoints
+    end
+
+    # set breakpoints allowed if the hash contains a key :allow_breakpoints with a value of true
+    def self.set(h)
+      @@allow_breakpoints = h[:allow_breakpoints] if h[:allow_breakpoints].is_a?(TrueClass)
+    end
+
+    # BlackStack::Debugging.breakpoint can be invoked in the middle of a running program. 
+    # It opens a Pry session at the point it's called and makes all program state at that point available. 
+    # When the session ends the program continues with any modifications you made to it.
+    #
+    # BlackStack::Debugging.breakpoint is just calling the Pry's `binding.pry` method, but only if the @@allow_breakpoints is true.
+    # 
+    def self.breakpoint()
+      # start a REPL session, if breakpoints are allowed
+      binding.pry if @@allow_breakpoints
+    end
+  end
+
+  # ----------------------------------------------------------------------------------------- 
   # OCRA Supporting Functions
   # ----------------------------------------------------------------------------------------- 
   module OCRA

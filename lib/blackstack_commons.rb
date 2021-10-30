@@ -1,3 +1,4 @@
+require 'pry'
 require 'content_spinning'
 require 'uri'
 require 'json'

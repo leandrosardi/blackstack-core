@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'blackstack_commons'
   s.version     = '1.1.43'
-  s.date        = '2021-09-05'
+  s.date        = '2021-10-30'
   s.summary     = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Commons classes, functions and constants for the BlackStack framework."
   s.description = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Find documentation here: https://github.com/leandrosardi/blackstack_commons."
   s.authors     = ["Leandro Daniel Sardi"]
@@ -22,4 +22,5 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.add_runtime_dependency 'content_spinning', '~> 0.3.1', '>= 0.3.1'
   s.add_runtime_dependency 'json', '~> 1.8.1', '>= 1.8.1'
+  s.add_runtime_dependency 'pry', '~> 0.14.1', '>= 0.14.1' # this is used to add breakpoints
 end
