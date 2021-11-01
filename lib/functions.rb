@@ -6,7 +6,8 @@ module BlackStack
   # ----------------------------------------------------------------------------------------- 
   module Debugging
     @@allow_breakpoints = false
-    
+    @@verbose = false
+
     # return true if breakpoints are allowed
     def self.allow_breakpoints
       @@allow_breakpoints
@@ -15,17 +16,19 @@ module BlackStack
     # set breakpoints allowed if the hash contains a key :allow_breakpoints with a value of true
     def self.set(h)
       @@allow_breakpoints = h[:allow_breakpoints] if h[:allow_breakpoints].is_a?(TrueClass)
-    end
+      @@verbose = h[:verbose] if h[:verbose].is_a?(TrueClass)
 
-    # BlackStack::Debugging.breakpoint can be invoked in the middle of a running program. 
-    # It opens a Pry session at the point it's called and makes all program state at that point available. 
-    # When the session ends the program continues with any modifications you made to it.
-    #
-    # BlackStack::Debugging.breakpoint is just calling the Pry's `binding.pry` method, but only if the @@allow_breakpoints is true.
-    # 
-    def self.breakpoint()
-      # start a REPL session, if breakpoints are allowed
-      binding.pry if @@allow_breakpoints
+      if !@@allow_breakpoints
+        # monkey patching the pry method to not break on breakpoints
+        new_pry = lambda do
+          print "Breakpoint are not allowed" if @@verbose
+        end
+
+        Binding.class_eval do 
+          alias_method :old_pry, :pry
+          define_method :pry, new_pry
+        end
+      end
     end
   end
 

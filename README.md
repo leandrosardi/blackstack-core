@@ -16,21 +16,34 @@ gem install blackstack_commons
 
 ## Break Points
 
-`BlackStack::Debugging.breakpoint` can be invoked in the middle of a running program. 
-It opens a Pry session at the point it's called and makes all program state at that point available. 
-When the session ends the program continues with any modifications you made to it.
+The `BlackStack::Debugging` can be configured to enable or disable [Pry](https://pry.github.io/)'s `binding.pry` breakpoints.
 
-`BlackStack::Debugging.breakpoint` is just calling the Pry's `binding.pry` method, but only if the @@allow_breakpoints is true.
+> `binding.pry` can be invoked in the middle of a running program. 
+> 
+> It opens a Pry session at the point it's called and makes all program state at that point available. 
+> 
+> When the session ends the program continues with any modifications you made to it.
+
+The `binding.pry` works only if `BlackStack::Debugging::allow_breakpoints` has not been set as `false`.
+
+If `BlackStack::Debugging::allow_breakpoints` has been set as `false`, then `BlackStack::Debugging` does a [monkey-patch](https://stackoverflow.com/a/17666791/14707410) to that [Pry](https://pry.github.io/)'s `binding.pry` method.
 
 ```ruby
+require_relative 'blackstack_commons'
+
 BlackStack::Debugging.set({
-  # activate this in your development environment only.
-  # never activate it in production.
-  :allow_breakpoints => true, # it is false by default
+    # set this to false to do a monkey-patch into the `binding.pry` method,
+    # in order to disable the breakpoint functionality. 
+    # 
+    # activate this in your development environment only.
+    # never activate it in production.
+    :allow_breakpoints => true, # it is false by default
+    # activate this to do a `print "Breakpoint are not allowed"` when calling `binding.pry` but `allow_breakpoints` is `false`
+    :verbose => true, # it is false by default
 })
 
 (1..100).each do |i|
-  BlackStack::Debugging.breakpoint
+  binding.pry if i == 50
   puts i
 end
 ```
