@@ -155,8 +155,7 @@ module BlackStack
     MATCH_DOMAIN                  = /(?:[A-Z0-9a-z\-]+\.)+[A-Za-z]{2,10}/
     MATCH_DATE_STANDARD           = /\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])/
     MATCH_PHONE                   = /(?:\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/
-    MATCH_URL                     = /(https?:\/\/)?([\da-z\.-]+)([\.\:])([\da-z]{2,6})([\/[\da-z\.\-]+]*)(\/)?(\?)?/i
-    MATCH_LINKEDIN_COMPANY_URL    = /(https?:\/\/)?(www\\.)?linkedin\.com\/company\//
+    MATCH_URL                     = /(https?:\/\/)?([\da-z\.-]+)([\.\:])([\da-z]{2,6})([\/[\da-z\.\-]+]*[\da-z])(\/)?(\?)?/i    MATCH_LINKEDIN_COMPANY_URL    = /(https?:\/\/)?(www\\.)?linkedin\.com\/company\//
     MATCH_FIXNUM                  = /[0-9]+/
     MATCH_CONTENT_SPINNING        = /{[^}]+}/
     MATCH_SPINNED_TEXT            = /code me/ # TODO: define this regex for the issue #1226
