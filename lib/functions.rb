@@ -155,7 +155,13 @@ module BlackStack
     MATCH_DOMAIN                  = /(?:[A-Z0-9a-z\-]+\.)+[A-Za-z]{2,10}/
     MATCH_DATE_STANDARD           = /\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])/
     MATCH_PHONE                   = /(?:\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/
+
+    # Note: MATCH_URL gets the URL up to '?', but it doesn't retrieves the parameters.
+    # Exmaple: 
+    #   https://foo.com/bar?param1=value1&param2=value2 --> https://foo.com/bar?
+    #   https://foo.com/bar/?param1=value1&param2=value2 --> https://foo.com/bar/?
     MATCH_URL                     = /(https?:\/\/)?([\da-z\.-]+)([\.\:])([\da-z]{2,6})([\/[\da-z\.\-]+]*[\da-z])(\/)?(\?)?/i
+
     MATCH_LINKEDIN_COMPANY_URL    = /(https?:\/\/)?(www\\.)?linkedin\.com\/company\//
     MATCH_FIXNUM                  = /[0-9]+/
     MATCH_CONTENT_SPINNING        = /{[^}]+}/
