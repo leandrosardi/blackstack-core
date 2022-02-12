@@ -573,6 +573,7 @@ module BlackStack
     # ssl_verify_mode: you can disabele SSL verification here. 
     # max_channels: this method use lockfiles to prevent an excesive number of API calls from each datacenter. There is not allowed more simultaneous calls than max_channels.
     # TODO: setup max_simultaneus_calls in the configurtion file.
+    # TODO: parameter support_redirections has been deprecated.
     def self.call_post(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, support_redirections=true)
 =begin
       # build the lockfile name
@@ -597,7 +598,7 @@ module BlackStack
           res = http.request req
           case res 
           when Net::HTTPSuccess then res
-          when Net::HTTPRedirection then BlackStack::Netting::call_post(URI(res['location']), params, BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, false) if support_redirections
+          #when Net::HTTPRedirection then BlackStack::Netting::call_post(URI(res['location']), params, BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, false) if support_redirections
           else
             res.error!
           end
