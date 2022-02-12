@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'blackstack_commons'
-  s.version     = '1.1.49'
-  s.date        = '2021-12-30'
+  s.version     = '1.1.50'
+  s.date        = '2022-02-12'
   s.summary     = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Commons classes, functions and constants for the BlackStack framework."
   s.description = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Find documentation here: https://github.com/leandrosardi/blackstack_commons."
   s.authors     = ["Leandro Daniel Sardi"]
