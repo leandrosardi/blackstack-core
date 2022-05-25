@@ -1,4 +1,4 @@
-# BlackStack Commons
+# BlackStack Core
 
 This gem has been designed as a part of the **BlackStack** framework.
 
@@ -11,7 +11,7 @@ Email to me if you want to collaborate, by testing this library in any Linux pla
 ## Installation
 
 ```
-gem install blackstack-commons
+gem install blackstack-core
 ```
 
 ## Break Points
@@ -29,7 +29,7 @@ The `binding.pry` works only if `BlackStack::Debugging::allow_breakpoints` has n
 If `BlackStack::Debugging::allow_breakpoints` has been set as `false`, then `BlackStack::Debugging` does a [monkey-patch](https://stackoverflow.com/a/17666791/14707410) to that [Pry](https://pry.github.io/)'s `binding.pry` method.
 
 ```ruby
-require_relative 'blackstack-commons'
+require_relative 'blackstack-core'
 
 BlackStack::Debugging.set({
     # set this to false to do a monkey-patch into the `binding.pry` method,
@@ -55,7 +55,7 @@ For more information about Pry, refere to this URL: [https://pry.github.io/](htt
 ## Passwords Validation 
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # returns true if the string meets all the security requirements for a password
 puts ""
@@ -76,7 +76,7 @@ Passwords
 ## GUIDs Validation
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # returns true if the string match with the regex of a GUID
 puts ""
@@ -106,7 +106,7 @@ GUIDs
 ## Filename Format Validation 
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # returns true if the string match with the regex of a filename
 puts ""
@@ -132,7 +132,7 @@ Filenames
 ## Email Format Validation 
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # returns true if the string match with the regex of an email
 puts ""
@@ -160,7 +160,7 @@ Emails
 ## Domain Name Format Validation 
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # returns true if the string match with the regex of a domain
 puts ""
@@ -198,7 +198,7 @@ Domains
 ## Phone Number Format Validation 
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # returns true if the string match with the regex of a phone number
 puts ""
@@ -234,7 +234,7 @@ Phone Numbers
 ## URL Format Validation 
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # returns true if the string match with the regex of a URL
 puts ""
@@ -272,7 +272,7 @@ URLs
 ## Fixnum Format Validation 
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # returns true if the string match with the regex of a number
 puts ""
@@ -304,7 +304,7 @@ Fixnums
 ## SQL Date-Time Format Validation 
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # returns true if the string match with the regex of a datetime used in the BlackStack's API
 puts ""
@@ -340,7 +340,7 @@ SQL DateTimes
 ## BlackStack API Date-Time Format Validation
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 #
 puts ""
@@ -376,7 +376,7 @@ API DateTimes
 ## Convert SQL Date-Time Format String, to BlackStack's API Date-Time Format String
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # Convierte un string con formato sql-datatime a un string con formato sql-datetime.
 puts ""
@@ -398,7 +398,7 @@ SQL DateTime -> API DateTime
 ## Convert BlackStack's API Date-Time Format String, to SQL Date-Time Format String
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # Convierte un string con formato api-datatime (yyyymmddhhmmss) a un string con formato sql-datetime (yyyy-mm-dd hh:mm:ss).
 puts ""
@@ -420,7 +420,7 @@ API DateTime -> SQL DateTime
 ## Convert SQL GUID to a Standard (Normalized) Format
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # Rewrite a GUID as a standard (normalized) format.
 puts ""
@@ -448,7 +448,7 @@ Any GUID -> Normalized Guid
 ## Escape String with Simple-Quotes to SQL Format
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # Escape simple-quotes too add the string into literal-string of a dynamic query build into the Ruby code.
 # Example: "I'm BlackStack" -> "I''m BlackStack" 
@@ -473,7 +473,7 @@ Any String -> String with Escaped Quotes
 ## Check if String is a Valid Spintax
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # 
 puts ""
@@ -503,7 +503,7 @@ Spintax
 ## Get Sample Text from Spintax
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # Returns a random spin from a spintax
 puts ""
@@ -531,7 +531,7 @@ Spin
 ## Convert Ruby Time Object to SQL Friendy Date-Time String
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # Converts a time object to an SQL friendy string
 puts ""
@@ -555,7 +555,7 @@ Time object -> SQL
 ## Convert Sting to HTML Friendy String
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # Converts number to a string with a format like xx,xxx,xxx.xxxx 
 puts ""
@@ -579,7 +579,7 @@ Fixnum & Floats -> Screen Friendly Text
 ## Convert FixNum Minutes to String with Description of Time Spent 
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 
 # Converts number to a string with a format like xx,xxx,xxx.xxxx 
 puts ""
@@ -621,7 +621,7 @@ This function is useful to require a configuration file when the script is runni
 More information: https://stackoverflow.com/questions/1937743/how-to-get-the-current-working-directorys-absolute-path-from-irb
 
 ```ruby
-require 'blackstack-commons'
+require 'blackstack-core'
 BlackStack::OCRA::require_in_working_path 'config.rb', ENV["OCRA_EXECUTABLE"] || __FILE__  
 ```
 

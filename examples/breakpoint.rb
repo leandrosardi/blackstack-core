@@ -1,4 +1,4 @@
-require_relative '../lib/blackstack-commons'
+require_relative '../lib/blackstack-core'
 
 BlackStack::Debugging.set({
     # set this to false to do a monkey-patch into the `binding.pry` method,
