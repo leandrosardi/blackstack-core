@@ -1,4 +1,4 @@
-require_relative '../lib/blackstack_commons'
+require_relative '../lib/blackstack-commons'
 
 # returns true if the string meets all the security requirements for a password
 puts ""
