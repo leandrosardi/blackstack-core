@@ -625,8 +625,13 @@ require 'blackstack-core'
 BlackStack::OCRA::require_in_working_path 'config.rb', ENV["OCRA_EXECUTABLE"] || __FILE__  
 ```
 
-#
+## Change Log
 
+| Version |                                                          |   |   |   |
+|---------|----------------------------------------------------------|---|---|---|
+| 1.1.x   | Supporting Ruby 2.2.4                                    |   |   |   |
+| 1.2.x   | Supporting Ruby 3.1.2 (refer to #3 for more information) |   |   |   |
+|         |                                                          |   |   |   |
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the last [ruby gem](https://rubygems.org/gems/simple_command_line_parser). 
