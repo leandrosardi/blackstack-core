@@ -299,7 +299,7 @@ module BlackStack
 
       #
       def self.encode_guid(s)
-        return s.gsub('{',"").gsub('}',"").upcase
+        return s.gsub('{',"").gsub('}',"").downcase
       end
 
       #
@@ -568,55 +568,45 @@ module BlackStack
     end
     
     # Call the API and return th result.
+    #
+    # Unlike `Net::HTTP::Post`, this method support complex json descriptors in order to submit complex data strucutres to access points.
+    # For more information about support for complex data structures, reference to: https://github.com/leandrosardi/mysaas/issues/59
+    #
     # url: valid internet address
     # params: hash of params to attach in the call
     # ssl_verify_mode: you can disabele SSL verification here. 
     # max_channels: this method use lockfiles to prevent an excesive number of API calls from each datacenter. There is not allowed more simultaneous calls than max_channels.
-    # TODO: setup max_simultaneus_calls in the configurtion file.
+    # 
     # TODO: parameter support_redirections has been deprecated.
+    #
     def self.call_post(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, support_redirections=true)
-=begin
-      # build the lockfile name
-      x = 0
-      if BlackStack::Netting.max_api_call_channels.to_i > 0
-        raise "Max Channels cannot be higher than #{BlackStack::Netting.lockfiles.size.to_s}" if BlackStack::Netting.max_api_call_channels > BlackStack::Netting.lockfiles.size
-        x = rand(BlackStack::Netting.max_api_call_channels)
-        # lock the file
-        BlackStack::Netting.lockfiles[x].flock(File::LOCK_EX) if use_lockfile
-      end
-=end
-      begin
-#puts 
-#puts "call_post:#{url}:."
-        # do the call
-        uri = URI(url)
-        ret = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => ssl_verify_mode) do |http|
-          req = Net::HTTP::Post.new(uri)
-          req['Content-Type'] = 'application/json'
-          req.set_form_data(params)
-          #req.body = body if !body.nil?
-          res = http.request req
-          case res 
-          when Net::HTTPSuccess then res
-          #when Net::HTTPRedirection then BlackStack::Netting::call_post(URI(res['location']), params, BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, false) if support_redirections
-          else
-            res.error!
-          end
+      # issue: https://github.com/leandrosardi/mysaas/issues/59  
+      #
+      # when ruby pushes hash of hashes (or hash of arrays), all values are converted into strings.
+      # and arrays are mapped to the last element only.
+      #
+      # the solution is to convert each element of the hash into a string using `.to_json` method.
+      # 
+      # reference: https://stackoverflow.com/questions/1667630/how-do-i-convert-a-string-object-into-a-hash-object
+      # 
+      # iterate the keys of the hash
+      # 
+      params.each { |key, value| params[key] = value.to_json }
+
+      # do the call
+      uri = URI(url)
+      ret = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => ssl_verify_mode) do |http|
+        req = Net::HTTP::Post.new(uri)
+        req['Content-Type'] = 'application/json'
+        req.set_form_data(params)
+        res = http.request req
+        case res 
+        when Net::HTTPSuccess then res
+        #when Net::HTTPRedirection then BlackStack::Netting::call_post(URI(res['location']), params, BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, false) if support_redirections
+        else
+          res.error!
         end
-        
-        # release the file
-#        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
-      rescue => e
-        # release the file
-#        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
-        
-        # elevo la excepcion
-        raise e
-      ensure
-        # release the file
-#        BlackStack::Netting.lockfiles[x].flock(File::LOCK_UN) if use_lockfile && BlackStack::Netting.max_api_call_channels.to_i > 0
-      end
-      
+      end      
       # return 
       ret
     end
