@@ -573,13 +573,13 @@ module BlackStack
     # For more information about support for complex data structures, reference to: https://github.com/leandrosardi/mysaas/issues/59
     #
     # url: valid internet address
-    # params: hash of params to attach in the call
+    # body: hash of body to attach in the call
     # ssl_verify_mode: you can disabele SSL verification here. 
     # max_channels: this method use lockfiles to prevent an excesive number of API calls from each datacenter. There is not allowed more simultaneous calls than max_channels.
     # 
     # TODO: parameter support_redirections has been deprecated.
     #
-    def self.call_post(url, params = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, support_redirections=true)
+    def self.call_post(url, body = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, support_redirections=true)
       # issue: https://github.com/leandrosardi/mysaas/issues/59  
       #
       # when ruby pushes hash of hashes (or hash of arrays), all values are converted into strings.
@@ -587,31 +587,26 @@ module BlackStack
       #
       # the solution is to convert each element of the hash into a string using `.to_json` method.
       # 
-      # reference: https://stackoverflow.com/questions/1667630/how-do-i-convert-a-string-object-into-a-hash-object
+      # references: 
+      # - https://stackoverflow.com/questions/1667630/how-do-i-convert-a-string-object-into-a-hash-object
+      # - https://stackoverflow.com/questions/67572866/how-to-build-complex-json-to-post-to-a-web-service-with-rails-5-2-and-faraday-ge
       # 
       # iterate the keys of the hash
       # 
-      params.each { |key, value| params[key] = value.to_json }
+      params = {} # not needed for post calls to access points
+      path = URI::parse(url).path
+      domain = url.gsub(/#{Regexp.escape(path)}/, '')
 
-      # do the call
-      uri = URI(url)
-      ret = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => ssl_verify_mode) do |http|
-        req = Net::HTTP::Post.new(uri)
-        req['Content-Type'] = 'application/json'
-        req.set_form_data(params)
-        res = http.request req
-        case res 
-        when Net::HTTPSuccess then res
-        #when Net::HTTPRedirection then BlackStack::Netting::call_post(URI(res['location']), params, BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, false) if support_redirections
-        else
-          res.error!
-        end
-      end      
-      # return 
+      conn = Faraday.new(domain, :ssl=>{:verify=>ssl_verify_mode!=OpenSSL::SSL::VERIFY_NONE})
+      ret = conn.post(path, params) do |req|
+        req.body = body.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['Accept'] =  'application/json'
+      end
       ret
     end
 
-    # 
+    # TODO: deprecated
     def self.api_call(url, params={}, method=BlackStack::Netting::CALL_METHOD_POST, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, max_retries=5)
       nTries = 0
       bSuccess = false

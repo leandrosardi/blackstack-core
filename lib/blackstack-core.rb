@@ -5,6 +5,7 @@ require 'json'
 require 'net/http'
 require 'openssl'
 require 'time'
+require 'faraday'
 =begin
 require 'html_to_plain_text'
 require "RedCloth"
