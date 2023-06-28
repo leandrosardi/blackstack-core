@@ -500,6 +500,36 @@ Spintax
 '{Hello|Hi World!'.spintax?... false
 ```
 
+## Get Spintax Validation Error
+
+```ruby
+require 'blackstack-core'
+
+# 
+puts ""
+puts "Spintax"
+a = [
+  "I'm BlackStack",
+  "Hello World!",
+  "{Hello|Hi} World!",
+  "{Hello|Hi|Good {Morning|Afternoon}} World!", # Nexted spintax. Not supported.
+  "{Hello|Hi World!", # wrong syntax.
+]
+a.each { |s|
+  print "'#{s}'.spintax?... "
+  puts s.valid_spinning_syntax?.to_s  
+}
+```
+
+```
+Spintax
+'I'm BlackStack'.spintax?... false
+'Hello World!'.spintax?... false
+'{Hello|Hi} World!'.spintax?... true
+'{Hello|Hi|Good {Morning|Afternoon}} World!'.spintax?... false
+'{Hello|Hi World!'.spintax?... false
+```
+
 ## Get Sample Text from Spintax
 
 ```ruby
