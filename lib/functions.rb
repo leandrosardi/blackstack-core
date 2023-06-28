@@ -560,7 +560,7 @@ module BlackStack
         res = http.request req
         case res
         when Net::HTTPSuccess then res
-        when Net::HTTPRedirection then BlackStack::Netting::call_get(URI(res['location']), params, false) if support_redirections
+        when Net::HTTPRedirection then BlackStack::Netting::call_get(URI(res['location']), params, ssl_verify_mode, false) if support_redirections
         else
           res.error!
         end
