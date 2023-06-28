@@ -408,13 +408,13 @@ module BlackStack
         }
               
         return false if n!=0
-        
+=begin
         # obtengo cada uno de los spinnings
         s.scan(MATCH_CONTENT_SPINNING).each { |x|
           a = x.split('|')
           raise "No variations delimited by '|' inside spinning block." if a.size <= 1
         }
-              
+=end        
         true
       end
       
