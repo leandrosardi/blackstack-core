@@ -819,6 +819,22 @@ module BlackStack
       return a
     end
 
+    # raise an exception if `email` is not a valid email address.
+    # return an array with the companies who are hosting an email address, by running the linux command `host`.
+    def self.getMailHandler(email)
+      value = email
+      # raise an exception if the data type is an email, but the email is not valid.
+      raise "Email #{value} is not valid" if !value.email?
+      # extract the domain from the email
+      domain = value.split('@').last
+      # run the `host` command
+      s = `host -t mx #{domain}`
+      # extract the domains from the output
+      a = s.split("\n").map { |l| l.split.last }
+      # extract the company who is hosting the mail
+      a.map { |d| d.split('.').last(2).join('.') }.uniq
+    end
+
   end # module Netting
   
 end # module BlackStack
