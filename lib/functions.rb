@@ -835,6 +835,19 @@ module BlackStack
       a.map { |d| d.split('.').last(2).join('.') }.uniq
     end
 
+    # raise an exception if `email` is not a valid email address.
+    # return if the email domain is gmail, hotmail, outlook, yahoo, comcast, aol, msn or sbcglobal.
+    def self.isPersonalEmail?(email)
+      value = email
+      # raise an exception if the data type is an email, but the email is not valid.
+      raise "Email #{value} is not valid" if !value.email?
+      # extract the domain from the email
+      domain = value.split('@').last
+      # 
+      domain~=/gmail\.com/ || domain~=/hotmail\.com/ || domain~=/outlook\.com/ || domain~=/yahoo\.com/ || domain~=/comcast\.com/ || domain~=/aol\.com/ || domain~=/msn\.com/ || domain~=/sbcglobal\.net/       
+    end
+
+
   end # module Netting
   
 end # module BlackStack
