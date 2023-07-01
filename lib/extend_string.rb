@@ -23,6 +23,20 @@ class String
     return false
   end
 
+  # raise an exception if `email` is not a valid email address.
+  # return if the email domain is gmail, hotmail, outlook, yahoo, comcast, aol, msn or sbcglobal.
+  def personal_email?
+    BlackStack::Netting.isPersonalEmail?(self.to_s)
+  end
+
+  # raise an exception if `email` is not a valid email address.
+  # return an array with the companies who are hosting an email address, by running the linux command `host`.
+  def mail_handler
+    BlackStack::Netting.getMailHandler(self.to_s)
+  end
+
+
+
   # returns true if the string match with the regex of a domain
   def domain?
     return true if self.to_s =~ /^#{BlackStack::Strings::MATCH_DOMAIN}$/  
