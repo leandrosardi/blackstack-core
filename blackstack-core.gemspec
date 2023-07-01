@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'blackstack-core'
-  s.version     = '1.2.9'
+  s.version     = '1.2.10'
   s.date        = '2023-07-31'
   s.summary     = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Core classes, functions and constants for the BlackStack framework."
   s.description = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Find documentation here: https://github.com/leandrosardi/blackstack-core."
