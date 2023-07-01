@@ -1,5 +1,24 @@
 require_relative '../lib/blackstack-core'
 
+# inform if it is a personal email address, and who is hosting that email
+a = [
+  'jloftus@qsd.fm',
+  'edg@egadesign.net',
+  'ghorn@strtrade.com',
+  'rbaker@luxurylakeoconee.com',
+  'sabbie.wijaya@gmail.com',
+  'stlbodj@swbell.net',
+  'OKnott@knottmechanical.com',
+  'ctekwani@gmail.com',
+  'billy@altgrouplv.com',
+  'bhaney@kingcastling.com',
+]
+a.each { |s|
+  print "'#{s}'.personal_email?... "
+  puts "#{s.personal_email?.to_s} (handler: #{s.mail_handler})"  
+}
+exit(0)
+
 # returns true if the string meets all the security requirements for a password
 puts ""
 puts "Passwords"

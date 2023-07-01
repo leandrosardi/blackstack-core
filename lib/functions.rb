@@ -844,7 +844,7 @@ module BlackStack
       # extract the domain from the email
       domain = value.split('@').last
       # 
-      domain~=/gmail\.com/ || domain~=/hotmail\.com/ || domain~=/outlook\.com/ || domain~=/yahoo\.com/ || domain~=/comcast\.com/ || domain~=/aol\.com/ || domain~=/msn\.com/ || domain~=/sbcglobal\.net/       
+      return domain=~/gmail\.com/ || domain=~/hotmail\.com/ || domain=~/outlook\.com/ || domain=~/yahoo\.com/ || domain=~/comcast\.com/ || domain=~/aol\.com/ || domain=~/msn\.com/ || domain=~/sbcglobal\.net/ ? true : false
     end
 
 
