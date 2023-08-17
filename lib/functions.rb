@@ -1,9 +1,9 @@
 
 module BlackStack
 
-  # Return true if there is a .sandbox file in the $RUBYLIB folder.
+  # Return true if there is a `.sandbox` file in the current folder `./`.
   def self.sandbox?
-    File.exists?('/$RUBYLIB/.sandbox')
+    File.exists?('./.sandbox')
   end
 
   module API

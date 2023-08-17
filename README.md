@@ -16,7 +16,7 @@ gem install blackstack-core
 
 ## Setting Up Sandbox Environment
 
-This function returns true if there is a .sandbox file in the $RUBYLIB folder.
+This function returns true if there is a `.sandbox` file in the current folder `./`.
 
 It is called by [mysaas](https://github.com/leandrosardi/mysaas) and by many [micro-services](https://github.com/leandrosardi/micro.template).
 
