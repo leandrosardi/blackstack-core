@@ -1,5 +1,11 @@
 
 module BlackStack
+
+  # Return true if there is a .sandbox file in the $RUBYLIB folder.
+  def sandbox?
+    File.exists?('/$RUBYLIB/.sandbox')
+  end
+
   module API
     # API connection parameters
     @@api_key = nil # Api-key of the client who will be the owner of a process.

@@ -14,6 +14,17 @@ Email to me if you want to collaborate, by testing this library in any Linux pla
 gem install blackstack-core
 ```
 
+## Setting Up Sandbox Environment
+
+This function returns true if there is a .sandbox file in the $RUBYLIB folder.
+
+It is called by [mysaas](https://github.com/leandrosardi/mysaas) and by many [micro-services](https://github.com/leandrosardi/micro.template).
+
+```ruby
+puts BlackStack.sandbox?
+# => true
+```
+
 ## API Credentials Manager
 
 This module is used by [mysaas](https://github.com/leandrosardi/mysaas) and by many [micro-services](https://github.com/leandrosardi/micro.template).
@@ -27,23 +38,8 @@ Setting up API credentials for communication between micro-services:
 # TODO: Switch back to HTTPS when the emails.leads.uplaod.ingest process is migrated to DropBox for elastic storage.
 # 
 BlackStack::API::set_api_url({
-  # IMPORTANT: It is strongly recommended that you 
-  # use the api_key of an account with prisma role, 
-  # and assigned to the central division too.
   :api_key => '118f3c32-****-****-****-************', 
-  # IMPORTANT: It is stringly recommended that you 
-  # write the URL of the central division here. 
   :api_protocol => SANDBOX ? 'http' : 'https',
-  # IMPORTANT: Even if you are running process in our LAN, 
-  # don't write a LAN IP here, since bots are designed to
-  # run anywhere worldwide.
-  #
-  # IMPORTANT: This is the only web-node where files are 
-  # being stored. Never change this IP by the TLD.
-  # References: AO
-  # - https://github.com/leandrosardi/leads/issues/110
-  # - https://github.com/leandrosardi/emails/issues/142
-  # 
   :api_domain => SANDBOX ? '127.0.0.1' : 'connectionsphere.com', 
   :api_port => SANDBOX ? '3000' : '443',
   :api_less_secure_port => '3000',
