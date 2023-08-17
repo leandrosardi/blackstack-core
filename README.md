@@ -16,7 +16,7 @@ gem install blackstack-core
 
 ## API Credentials Manager
 
-This module is used by [mysaas](https://github.com/leandrosardi/mysaas) and by many [mmicro-services](https://github.com/leandrosardi/micro.template).
+This module is used by [mysaas](https://github.com/leandrosardi/mysaas) and by many [micro-services](https://github.com/leandrosardi/micro.template).
 
 Setting up API credentials for communication between micro-services:
 
