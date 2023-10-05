@@ -2,46 +2,86 @@
 
 This gem has been designed as a part of the **BlackStack** framework.
 
-It has some commons functions that are needed for most of all the **BlackStack** services.
+It has some commons functions that are needed for most of all the **BlackStack** projects.
 
-I ran tests in Windows environments only.
+I ran tests on:
 
-Email to me if you want to collaborate, by testing this library in any Linux platform.
+- Ubuntu 18.04,
+- Ubuntu 20.04, and
+- Windows 7 only.
 
-## Installation
+Email to me if you want to collaborate.
+
+**Outline**
+
+1. [Installation](#1-installation)
+2. [Sandbox](#2-sandbox)
+3. [Internal API](#3-internal-api)
+4. [Break Points](#4-break-points)
+5. [Passwords Validation](#5-passwords-validation)
+6. [GUIDs Validation](#6-guids-validation)
+7. [Filenames Validation](#7-filenames-validation)
+8. [Emails Validation](#8-emails-validation)
+9. [Domains Validation](#9-domains-validation)
+10. [Phone Numbers Validation](#10-phone-numbers-validation)
+11. [URLs Validation](#11-urls-validation)
+12. [Integers Validation](#12-integers-validation)
+13. [SQL Date-Times Validation](#13-sql-date-times-validation)
+14. [GUID Normalization](#14-guid-normalization)
+15. [SQL Encoding](#15-sql-encoding)
+16. [Spintax Validation](#16-spintax-validation)
+17. [Spintax Errors](#17-spintax-errors)
+18. [Spintax Sampling](#18-spintax-sampling)
+19. [Numbers Labeling](#19-numbers-labeling)
+20. [Time Spent Labeling](#20-time-spent-labeling)
+21. [Exceptions Encoding](#21-exceptions-encoding)
+22. [Encoding Strings](#22-encoding-strings)
+
+## 1. Installation
 
 ```
 gem install blackstack-core
 ```
 
-## Setting Up Sandbox Environment
+Require `blackstack-core` in your Ruby scripts.
+
+```ruby
+require 'blackstack-core
+```
+
+## 2. Sandbox
 
 This function returns true if there is a `.sandbox` file in the current folder `./`.
 
-It is called by [mysaas](https://github.com/leandrosardi/mysaas) and by many [micro-services](https://github.com/leandrosardi/micro.template).
+It is often used by [my.saas](https://github.com/leandrosardi/my.saas) and by many [micro-services](https://github.com/leandrosardi/micro.template), to switch configurations between **development environment** and **production environment**.
+
+You can create the `.sandbox` file using the `touch` command, like is shown below:
+
+```
+touch .sandbox
+```
+
+You can check if the `.sandbox` file exists, using the Ruby code below.
 
 ```ruby
 puts BlackStack.sandbox?
 # => true
 ```
 
-## API Credentials Manager
+## 3. Internal API
 
-This module is used by [mysaas](https://github.com/leandrosardi/mysaas) and by many [micro-services](https://github.com/leandrosardi/micro.template).
+This module is used by [my.saas](https://github.com/leandrosardi/my.saas) and by many [micro-services](https://github.com/leandrosardi/micro.template) for internal communication between them.
 
-Setting up API credentials for communication between micro-services:
+This module is to register the API key and URL of the **my.saas**, where all **micro-services** must submit the results of their jobs.
 
 ```ruby
-# Setup connection to the API, in order get bots requesting and pushing data to the database.
-# TODO: write your API-Key here. Refer to this article about how to create your API key:
+# Setup connection to the API, in order get micro-services requesting and pushing data from/to the my.saas.
 #
-# TODO: Switch back to HTTPS when the emails.leads.uplaod.ingest process is migrated to DropBox for elastic storage.
-# 
 BlackStack::API::set_api_url({
   :api_key => '118f3c32-****-****-****-************', 
-  :api_protocol => SANDBOX ? 'http' : 'https',
-  :api_domain => SANDBOX ? '127.0.0.1' : 'connectionsphere.com', 
-  :api_port => SANDBOX ? '3000' : '443',
+  :api_protocol => BlackStack.sandbox? ? 'http' : 'https',
+  :api_domain => BlackStack.sandbox? ? '127.0.0.1' : 'connectionsphere.com', 
+  :api_port => BlackStack.sandbox? ? '3000' : '443',
   :api_less_secure_port => '3000',
 })
 ```
@@ -67,7 +107,7 @@ puts BlackStack::API.api_less_secure_url
 # => http://connectionspher.com:3000
 ```
 
-## Break Points
+## 4. Break Points
 
 The `BlackStack::Debugging` can be configured to enable or disable [Pry](https://pry.github.io/)'s `binding.pry` breakpoints.
 
@@ -80,6 +120,8 @@ The `BlackStack::Debugging` can be configured to enable or disable [Pry](https:/
 The `binding.pry` works only if `BlackStack::Debugging::allow_breakpoints` has not been set as `false`.
 
 If `BlackStack::Debugging::allow_breakpoints` has been set as `false`, then `BlackStack::Debugging` does a [monkey-patch](https://stackoverflow.com/a/17666791/14707410) to that [Pry](https://pry.github.io/)'s `binding.pry` method.
+
+**Example:**
 
 ```ruby
 require_relative 'blackstack-core'
@@ -101,11 +143,30 @@ BlackStack::Debugging.set({
 end
 ```
 
-The goal of using `BlackStack::Debugging.breakpoint` instead `binding.pry` is to keep the brakpoints in your source code being sure that they will work in your development environment only, by handling 2 differnet ruby configuration files (example: `config.dev.rb` and `config.prod.rb`)
+The goal of using `BlackStack::Debugging` instead of the original `binding.pry` function, is to keep the brakpoints in your source off when running on production.
 
-For more information about Pry, refere to this URL: [https://pry.github.io/](https://pry.github.io/)
+To accomplish with that, we combine `BlackStack::Debugging` with `BlackStack.sandbox?`.
 
-## Passwords Validation 
+**Example:**
+
+```ruby
+require_relative 'blackstack-core'
+
+BlackStack::Debugging.set({
+    # set this to false to do a monkey-patch into the `binding.pry` method,
+    # in order to disable the breakpoint functionality. 
+    # 
+    # activate this in your development environment only.
+    # never activate it in production.
+    :allow_breakpoints => BlackStack.sandbox?, # it is false by default
+    # activate this to do a `print "Breakpoint are not allowed"` when calling `binding.pry` but `allow_breakpoints` is `false`
+    :verbose => true, # it is false by default
+})
+```
+
+## 5. Passwords Validation
+
+Use the `password?` method to check if a password meets with **stregth standard** of BlackStack.
 
 ```ruby
 require 'blackstack-core'
@@ -126,7 +187,7 @@ Passwords
 'HelloWorld12$3'.password?... true
 ```
 
-## GUIDs Validation
+## 6. GUIDs Validation
 
 ```ruby
 require 'blackstack-core'
@@ -156,7 +217,7 @@ GUIDs
 '331A92C35FE147A2A31BCFA439B5B4F9'.guid?... false
 ```
 
-## Filename Format Validation 
+## 7. Filenames Validation
 
 ```ruby
 require 'blackstack-core'
@@ -182,7 +243,7 @@ Filenames
 'filename.txt.rar'.filename?... false
 ```
 
-## Email Format Validation 
+## 8. Emails Validation
 
 ```ruby
 require 'blackstack-core'
@@ -210,7 +271,7 @@ Emails
 'tango@'.email?... false
 ```
 
-## Domain Name Format Validation 
+## 9. Domains Validation
 
 ```ruby
 require 'blackstack-core'
@@ -248,7 +309,7 @@ Domains
 'https://www.expandedventure.com.ar'.domain?... true
 ```
 
-## Phone Number Format Validation 
+## 10. Phone Numbers Validation
 
 ```ruby
 require 'blackstack-core'
@@ -284,7 +345,7 @@ Phone Numbers
 '+54-545-561-2148'.domain?... true
 ```
 
-## URL Format Validation 
+## 11. URLs Validation
 
 ```ruby
 require 'blackstack-core'
@@ -322,7 +383,7 @@ URLs
 'https://www.expandedventure.com.ar'.url?... true
 ```
 
-## Fixnum Format Validation 
+## 12. Integers Validation
 
 ```ruby
 require 'blackstack-core'
@@ -354,7 +415,7 @@ Fixnums
 '5.000'.fixnum?... false
 ```
 
-## SQL Date-Time Format Validation 
+## 13. SQL Date-Times Validation
 
 ```ruby
 require 'blackstack-core'
@@ -390,87 +451,7 @@ SQL DateTimes
 '2019-11-06 21:50:70'.sql_datetime?... false
 ```
 
-## BlackStack API Date-Time Format Validation
-
-```ruby
-require 'blackstack-core'
-
-#
-puts ""
-puts "API DateTimes"
-a = [
-  '20191106215030',
-  '20191106',
-  '2019-11-06',
-  '2019-11-06 21:50:30',
-  '20191306215030', # invalid month
-  '20191106255030', # invalid hour
-  '20191106217030', # invalid minute
-  '20191106215070', # invalid second
-]
-a.each { |s|
-  print "'#{s.to_s}'.api_datetime?... "
-  puts s.api_datetime?.to_s
-}
-```
-
-```
-API DateTimes
-'20191106215030'.api_datetime?... true
-'20191106'.api_datetime?... false
-'2019-11-06'.api_datetime?... false
-'2019-11-06 21:50:30'.api_datetime?... false
-'20191306215030'.api_datetime?... false
-'20191106255030'.api_datetime?... false
-'20191106217030'.api_datetime?... false
-'20191106215070'.api_datetime?... false
-```
-
-## Convert SQL Date-Time Format String, to BlackStack's API Date-Time Format String
-
-```ruby
-require 'blackstack-core'
-
-# Convierte un string con formato sql-datatime a un string con formato sql-datetime.
-puts ""
-puts "SQL DateTime -> API DateTime"
-a = [
-  '2019-11-06 21:50:30',
-]
-a.each { |s|
-  print "'#{s.to_s}'.sql_to_api_datetime... "
-  puts s.sql_to_api_datetime.to_s
-}
-```
-
-```
-SQL DateTime -> API DateTime
-'2019-11-06 21:50:30'.sql_to_api_datetime... 20191106215030
-```
-
-## Convert BlackStack's API Date-Time Format String, to SQL Date-Time Format String
-
-```ruby
-require 'blackstack-core'
-
-# Convierte un string con formato api-datatime (yyyymmddhhmmss) a un string con formato sql-datetime (yyyy-mm-dd hh:mm:ss).
-puts ""
-puts "API DateTime -> SQL DateTime"
-a = [
-  '20191106215030',
-]
-a.each { |s|
-  print "'#{s.to_s}'.api_to_sql_datetime... "
-  puts s.api_to_sql_datetime.to_s
-}
-```
-
-```
-API DateTime -> SQL DateTime
-'20191106215030'.api_to_sql_datetime... 2019-11-06 21:50:30
-```
-
-## Convert SQL GUID to a Standard (Normalized) Format
+## 14. GUID Normalization
 
 ```ruby
 require 'blackstack-core'
@@ -498,7 +479,7 @@ Any GUID -> Normalized Guid
 '331A92C3-5FE1-47A2-A31B-CFA439B5B4F9'.to_guid... 331A92C3-5FE1-47A2-A31B-CFA439B5B4F9
 ```
 
-## Escape String with Simple-Quotes to SQL Format
+## 15. SQL Encoding
 
 ```ruby
 require 'blackstack-core'
@@ -523,7 +504,7 @@ Any String -> String with Escaped Quotes
 'Hello World!'.to_sql... Hello World!
 ```
 
-## Check if String is a Valid Spintax
+## 16. Spintax Validation
 
 ```ruby
 require 'blackstack-core'
@@ -553,7 +534,7 @@ Spintax
 '{Hello|Hi World!'.spintax?... false
 ```
 
-## Get Spintax Validation Error
+## 17. Spintax Errors
 
 ```ruby
 require 'blackstack-core'
@@ -583,7 +564,7 @@ Spintax
 '{Hello|Hi World!'.spintax?... false
 ```
 
-## Get Sample Text from Spintax
+## 18. Spintax Sampling
 
 ```ruby
 require 'blackstack-core'
@@ -611,31 +592,7 @@ Spin
 '{Hello|Hi|Good Morning|Good Afternoon} World!'.spin... Good Morning World!
 ```
 
-## Convert Ruby Time Object to SQL Friendy Date-Time String
-
-```ruby
-require 'blackstack-core'
-
-# Converts a time object to an SQL friendy string
-puts ""
-puts "Time object -> SQL"
-a = [
-  Time.new(2019,11,6,15,25,55),
-  DateTime.new(2019,11,6,15,25,55),
-]
-a.each { |o|
-  print "'#{o.to_s}'.to_sql... "
-  puts o.to_sql  
-}
-```
-
-```
-Time object -> SQL
-'2019-11-06 15:25:55 -0300'.to_sql... 2019-11-06 15:25:55
-'2019-11-06T15:25:55+00:00'.to_sql... 2019-11-06 15:25:55
-```
-
-## Convert Sting to HTML Friendy String
+## 19. Numbers Labeling
 
 ```ruby
 require 'blackstack-core'
@@ -659,7 +616,9 @@ Fixnum & Floats -> Screen Friendly Text
 '64443.5454'.to_label... 64,443.5454
 ```
 
-## Convert FixNum Minutes to String with Description of Time Spent 
+## 20. Time Spent Labeling
+
+Convert FixNum Minutes to String with Description of Time Spent 
 
 ```ruby
 require 'blackstack-core'
@@ -697,15 +656,54 @@ Minutes '1500'.to_time_spent... 1 days, 1 hours
 Minutes '1501'.to_time_spent... 1 days, 1 hours
 ```
 
-## OCRA Supporting Functions
+## 21. Exceptions Encoding
 
-OCRA files run into a temp folder, where the script is unpacked.
-This function is useful to require a configuration file when the script is running inside an OCRA temp folder, since the local folder of the running command is not the folder where the exe file is hosted.
-More information: https://stackoverflow.com/questions/1937743/how-to-get-the-current-working-directorys-absolute-path-from-irb
+How an exception message.
 
 ```ruby
-require 'blackstack-core'
-BlackStack::OCRA::require_in_working_path 'config.rb', ENV["OCRA_EXECUTABLE"] || __FILE__  
+print 'Do something... '
+begin
+  raise "An error happened here"
+  puts 'done'
+rescue => e
+  puts e.to_console
+end
+```
+
+By default, `to_console` includes all the backtrace. You can disable it.
+
+```ruby
+print 'Do something... '
+begin
+  raise "An error happened here"
+  puts 'done'
+rescue => e
+  puts e.to_console(false)
+end
+```
+
+If you want to show the backtrace into a webpage, use `to_html` instead, in order to encode the content properly.
+
+```ruby
+print 'Do something... '
+begin
+  raise "An error happened here"
+  puts 'done'
+rescue => e
+  puts e.to_html
+end
+```
+
+## 22. Encoding Strings
+
+To show any string into an HTML page, you have to encode it properly.
+
+```ruby
+<%
+lesson = 'Use HTML entieties (e.g.: &cent;) and tabas (e.g.: <h1>title</h1>) in your HTML code.'
+%>
+<h1>Introduction to HTML</h1>
+<p><%=lesson%></p>
 ```
 
 ## Change Log
