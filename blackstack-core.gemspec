@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
   s.name        = 'blackstack-core'
-  s.version     = '1.2.14'
-  s.date        = '2023-08-17'
-  s.summary     = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Core classes, functions and constants for the BlackStack framework."
-  s.description = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Find documentation here: https://github.com/leandrosardi/blackstack-core."
+  s.version     = '1.2.15'
+  s.date        = '2023-10-06'
+  s.summary     = "Core modules, functions and constants for the BlackStack framework."
+  s.description = "Find documentation here: https://github.com/leandrosardi/blackstack-core."
   s.authors     = ["Leandro Daniel Sardi"]
   s.email       = 'leandro.sardi@expandedventure.com'
   s.files       = [
