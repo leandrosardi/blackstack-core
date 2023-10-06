@@ -24,4 +24,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'json', '~> 2.6.1', '>= 2.6.1'
   s.add_runtime_dependency 'pry', '~> 0.14.1', '>= 0.14.1' # this is used to add breakpoints
   s.add_runtime_dependency 'faraday', '~> 2.3.0', '>= 2.3.0' # this is used to submit complex json structures to access points
+  s.add_runtime_dependency 'sequel', '~> 5.56.0', '>= 5.56.0'
 end
