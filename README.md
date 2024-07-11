@@ -726,3 +726,120 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 
+
+## 23. OCRA Packaging
+The `BlackStack::OCRA` module provides utilities for working with OCRA, an open-source Ruby-to-exe application packager.
+
+Example:
+```ruby
+# Initialize OCRA configuration settings
+BlackStack::OCRA.init_settings
+```
+
+## 24. DateTime Utilities
+`BlackStack::DateTime` provides common functions for handling date and time operations.
+
+### 24.1 Encoding
+The `DateTime::Encoding` submodule offers methods to format and handle various date and time representations.
+
+Example:
+```ruby
+# Format a DateTime object into an SQL-friendly string
+puts Time.now.to_sql
+# => "YYYY-MM-DD HH:MM:SS"
+```
+
+### 24.2 Miscellaneous
+The `DateTime::Misc` submodule contains various helper methods for date and time calculations not covered in encoding.
+
+Example:
+```ruby
+# Check if a given year is a leap year
+puts BlackStack::DateTime::Misc.leap_year?(2024)
+```
+
+## 25. Number Handling
+`BlackStack::Number` includes functions related to number formatting and presentation.
+
+### 25.1 Encoding
+`Number::Encoding` offers functionality to convert numbers into human-readable formats, such as with thousands separators or as time spent descriptions.
+
+Example:
+```ruby
+# Format a large number with separators
+puts 1234567.to_label
+# => "1,234,567"
+```
+
+## 26. String Extensions
+`BlackStack::Strings` extends the `String` class with additional validation, comparison, and formatting methods.
+
+### 26.1 SQL Helpers
+`Strings::SQL` provides methods to properly escape strings for use in SQL queries.
+
+Example:
+```ruby
+# Escape single quotes for SQL insertion
+puts "OReilly".to_sql
+# => "OReilly"
+```
+
+### 26.2 Comparing Strings
+`Strings::Comparing` offers methods to compare strings, such as case-insensitive comparisons.
+
+Example:
+```ruby
+# Compare strings case-insensitively
+puts "Test".same_as?("test")
+# => true
+```
+
+### 26.3 DateTime Parsing
+`Strings::DateTime` provides methods for parsing and working with date-time strings.
+
+Example:
+```ruby
+# Parse a date-time string into a Time object
+puts "2021-04-25 14:00:00".to_time
+# => 2021-04-25 14:00:00 -0400
+```
+
+### 26.4 Spintax Handling
+`Strings::Spinning` includes methods for working with spintax, allowing for the generation of varied text from patterns.
+
+Example:
+```ruby
+# Spin a spintax string to produce random variations
+puts "{Hello|Hi|Hey} there!".spin
+# => "Hi there!"
+```
+
+### 26.5 Miscellaneous
+`Strings::Misc` includes a collection of miscellaneous string-related helper methods.
+
+Example:
+```ruby
+# Remove all non-numeric characters from a string
+puts "Order #12345".only_numbers
+```
+
+### 26.6 Appending Content
+`Strings::Appending` offers methods to format and append content to strings effectively.
+
+Example:
+```ruby
+# Append a string with a delimiter
+puts "Hello".append_with_comma("World")
+# => "Hello, World"
+```
+
+## 27. Networking Utilities
+`BlackStack::Netting` includes methods for handling common networking tasks, such as making HTTP requests or parsing URLs.
+
+Example:
+```ruby
+# Perform a simple GET request to an API endpoint
+response = BlackStack::Netting.simple_get("http://example.com/api/data")
+puts response.body
+```
+
