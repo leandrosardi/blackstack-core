@@ -6,88 +6,291 @@ module BlackStack
     File.exists?('./.sandbox')
   end
 
-  module API
-    # API connection parameters
-    @@api_key = nil # Api-key of the client who will be the owner of a process.
-    @@api_protocol = nil # Protocol, HTTP or HTTPS, of the BlackStack server where this process will be registered.
-    @@api_domain = nil # Domain of the BlackStack server where this process will be registered.
-    @@api_port = nil # Port of the BlackStack server where this process will be registered.
-    @@api_less_secure_port = nil # Port of the BlackStack server where this process will be registered.
+  module BlackStack 
+    module API
+        @@api_key = nil
+        @@api_url = nil
+        @@api_port = nil
+        @@api_version = '1.0'
+        @@classes = {}
 
-    # API connection getters and setters
-    def self.api_key()
-      @@api_key 
-    end
-    def self.api_protocol
-      @@api_protocol
-    end 
-    def self.api_domain
-      @@api_domain
-    end
-    def self.api_port
-      @@api_port
-    end
-    def self.api_less_secure_port
-      @@api_less_secure_port
-    end
-    def self.api_url()
-      "#{BlackStack::API.api_protocol}://#{BlackStack::API.api_domain}:#{BlackStack::API.api_port}"
-    end
-    def self.api_less_secure_url()
-      "http://#{BlackStack::API.api_domain}:#{BlackStack::API.api_less_secure_port}"
-    end
-    def self.set_api_key(s)
-      # validate: the parameter s is required
-      raise 'The parameter s is required' unless s
+        def self.api_key
+            @@api_key
+        end # def self.api_key
 
-      # validate: the parameter s must be a string
-      raise 'The parameter s must be a string' unless s.is_a?(String)
+        def self.api_url
+            @@api_url
+        end 
 
-      # map values
-      @@api_key = s
-    end
-    def self.set_api_url(h)
-      # validate: the parameter h is requred
-      raise "The parameter h is required." if h.nil?
+        def self.api_version
+            @@api_version
+        end # def self.api_version
 
-      # validate: the parameter h must be a hash
-      raise "The parameter h must be a hash" unless h.is_a?(Hash)
+        def self.api_port
+            @@api_port
+        end # def self.api_port
 
-      # validate: the :api_key key is required
-      raise 'The key :api_key is required' unless h.has_key?(:api_key)
+        def self.api_url()
+            "#{BlackStack::API.api_protocol}://#{BlackStack::API.api_domain}:#{BlackStack::API.api_port}"
+        end      
 
-      # validate: the :api_protocol key is required
-      raise 'The key :api_protocol is required' unless h.has_key?(:api_domain)
+        def self.classes
+            @@classes
+        end # def self.classes
+        
+        def self.set_client(
+            api_key: ,
+            api_url: ,
+            api_version: '1.0',
+            api_port: nil
+        )
+            @@api_key = api_key
+            @@api_url = api_url
+            @@api_version = api_version
+            @@api_port = api_port
+        end # def self.set_client
 
-      # validate: the :api_domain key is required
-      raise 'The key :api_domain is required' unless h.has_key?(:api_domain)
+        def self.set_server(
+            classes: {}
+        )
+            @@classes = classes
+        end # def self.set_server
 
-      # validate: the :api_port key is required
-      raise 'The key :api_port is required' unless h.has_key?(:api_port)
+        def self.post(
+            endpoint: , 
+            params: {}
+        )
+            begin
+                url = "#{@@api_url}:#{@@api_port}/api#{@@api_version}/#{endpoint}.json"
+                params['api_key'] = @@api_key
+                res = BlackStack::Netting.call_post(url, params)
+                parsed = JSON.parse(res.body)
+                return JSON.parse(res.body)
 
-      # validate: the :api_key key is a string
-      raise 'The key :api_key must be a string' unless h[:api_key].is_a?(String)
+                ## write response.body into a file
+                # File.open('response.body.html', 'w') { |file| file.write(res.body) }
+            rescue => e
+                return {
+                    'status' => e.message,
+                    'value' => e.to_console
+                }
+            end
+        end # def self.post
 
-      # validate: the :api_protocol key is a string
-      raise 'The key :api_protocol must be a string' unless h[:api_protocol].is_a?(String)
+    end # module API
+  end # module Mass
 
-      # validate: the :api_domain key is a string
-      raise 'The key :api_domain must be a string' unless h[:api_domain].is_a?(String)  
 
-      # validate: the :api_port key is an integer, or a string that can be converted to an integer
-      raise 'The key :api_port must be an integer' unless h[:api_port].is_a?(Integer) || (h[:api_port].is_a?(String) && h[:api_port].to_i.to_s == h[:api_port])
+  module BlackStack 
+    # Base class.
+    # List of methods you have to overload if you develop a profile type.
+    # 
+    class Base
+        # object json descriptor
+        attr_accessor :desc
 
-      # validate: the :api_less_secure_port key is an integer, or a string that can be converted to an integer
-      raise 'The key :api_less_secure_port must be an integer' unless h[:api_less_secure_port].is_a?(Integer) || (h[:api_less_secure_port].is_a?(String) && h[:api_less_secure_port].to_i.to_s == h[:api_less_secure_port])
+        def self.object_name
+            raise 'You have to overload this method in your class.'
+        end
 
-      # map the values
-      @@api_key = h[:api_key]
-      @@api_protocol = h[:api_protocol]
-      @@api_domain = h[:api_domain]
-      @@api_port = h[:api_port].to_i
-      @@api_less_secure_port = h[:api_less_secure_port].to_i
-    end
-end # module API
+        def initialize(h)
+            self.desc = h
+        end
+
+        # Crate an instance of a child class using speicfications in the `desc['name']` attribute.
+        # By default, returns the same instance.
+        def child_class_instance
+            return self
+        end
+
+        def self.account_value(field:)
+            params = {}
+            params['field'] = field
+            # call the API
+            ret = BlackStack::API.post(
+                endpoint: "account_value",
+                params: params
+            )
+            raise "Error calling account_value endpoint: #{ret['status']}" if ret['status'] != 'success'
+            return ret['result']
+        end # def self.base
+
+
+        # Get array of hash descriptor of profile.
+        # 
+        # Parameters: 
+        # - page: integer. Page number.
+        # - limit: integer. Number of profiles per page.
+        # - params: hash. Additional filter parameters used by the specific child class.
+        #
+        def self.page(page:, limit:, filters: {})
+            # add page and limit to the params
+            params = {}
+            params['page'] = page
+            params['limit'] = limit
+            params['filters'] = filters
+            params['backtrace'] = Mass.backtrace
+            # call the API
+            ret = BlackStack::API.post(
+                endpoint: "#{self.object_name}/page",
+                params: params
+            )
+            raise "Error calling page endpoint: #{ret['status']}" if ret['status'] != 'success'
+            return ret['results'].map { |h| self.new(h).child_class_instance }
+        end # def self.base
+
+        # Get array of hash descriptors of profiles.
+        # 
+        # Parameters: 
+        # - id: guid. Id of the profile to bring.
+        #
+        def self.count
+            params = {}
+            params['backtrace'] = Mass.backtrace
+            ret = BlackStack::API.post(
+                endpoint: "#{self.object_name}/count",
+                params: params
+            )
+            raise "Error calling count endpoint: #{ret['status']}" if ret['status'] != 'success'
+            return ret['result'].to_i
+        end # def self.count
+
+        # Get array of hash descriptors of profiles.
+        # 
+        # Parameters: 
+        # - id: guid. Id of the profile to bring.
+        #
+        def self.get(id)
+            params = {}
+            params['id'] = id
+            params['backtrace'] = Mass.backtrace
+            ret = BlackStack::API.post(
+                endpoint: "#{self.object_name}/get",
+                params: params
+            )
+            raise "Error calling get endpoint: #{ret['status']}" if ret['status'] != 'success'
+            return self.new(ret['result']).child_class_instance
+        end # def self.get
+
+        # Submit a hash descriptor to the server for an update
+        #
+        def self.update(desc)
+            params = {}
+            params['desc'] = desc
+            params['backtrace'] = Mass.backtrace
+            ret = BlackStack::API.post(
+                endpoint: "#{self.object_name}/update",
+                params: params
+            )
+            raise "Error calling update endpoint: #{ret['status']}" if ret['status'] != 'success'
+            return self.new(ret['result']).child_class_instance
+        end # def self.update
+
+        # Submit a hash descriptor to the server for an update
+        #
+        def update
+            self.class.update(self.desc)
+        end
+
+        # Submit a hash descriptor to the server for an insert
+        #
+        def self.insert(desc)
+            params = {}
+            params['desc'] = desc
+            params['backtrace'] = Mass.backtrace
+            ret = BlackStack::API.post(
+                endpoint: "#{self.object_name}/insert",
+                params: params
+            )
+            raise "Error calling insert endpoint: #{ret['status']}" if ret['status'] != 'success'
+            return self.new(ret['result']).child_class_instance
+        end # def self.insert
+
+
+        # Submit a hash descriptor to the server for an upsert
+        #
+        def self.upsert(desc)
+            params = {}
+            params['desc'] = desc
+            params['backtrace'] = Mass.backtrace
+            ret = BlackStack::API.post(
+                endpoint: "#{self.object_name}/upsert",
+                params: params
+            )
+            raise "Error calling upsert endpoint: #{ret['status']}" if ret['status'] != 'success'
+            return self.new(ret['result']).child_class_instance
+        end # def self.upsert
+
+        # Submit a hash descriptor to the server for an upsert
+        #
+        def upsert
+            self.class.upsert(self.desc)
+        end
+
+
+        # return the HTML of a page downloaded by Zyte.
+        #
+        # Parameters:
+        # - url: the URL of the page to download.
+        # - api_key: the Zyte API key.
+        # - options: the options to pass to Zyte.
+        #
+        def zyte_html(url, api_key:, options:, data_filename:)
+            ret = nil
+            # getting the HTML
+            zyte = ZyteClient.new(key: api_key)
+            html = zyte.extract(url: url, options: options, data_filename: data_filename) 
+            # return the URL of the file in the cloud
+            return html
+        end # def zyte_html
+
+        # create a file in the cloud with the HTML of a page downloaded by Zyte.
+        # return the URL of the file.
+        #
+        # Parameters:
+        # - url: the URL of the page to download.
+        # - api_key: the Zyte API key.
+        # - options: the options to pass to Zyte.
+        # - dropbox_folder: the folder in the cloud where to store the file. If nil, it will use the self.desc['id_account'] value.
+        # - retry_times: the number of times to retry the download until the HTML is valid.
+        #
+        def zyte_snapshot(url, api_key:, options:, data_filename:, dropbox_folder:nil, retry_times: 3)
+            # "The garbage character must be due to the 520 error code which was caused on the second request."
+            garbage = "\x9E\xE9e"
+            
+            ret = nil
+            raise "Either dropbox_folder parameter or self.desc['id_account'] are required." if dropbox_folder.nil? && self.desc['id_account'].nil?
+            dropbox_folder = self.desc['id_account'] if dropbox_folder.nil?
+            # build path to the local file in /tmp
+            id = SecureRandom.uuid
+            filename = "#{id}.html"
+            tmp_path = "/tmp/#{filename}"
+            # build path to the file in the cloud
+            year = Time.now.year.to_s.rjust(4,'0')
+            month = Time.now.month.to_s.rjust(2,'0')
+            dropbox_folder = "/massprospecting.bots/#{dropbox_folder}.#{year}.#{month}"
+            dropbox_path = "#{dropbox_folder}/#{filename}"
+            # getting the HTML - Retry mechanism
+            zyte = ZyteClient.new(key: api_key)
+            try = 0
+            html = garbage
+            while try < retry_times && html == garbage
+                html = zyte.extract(url: url, options: options, data_filename: data_filename) 
+                try += 1
+            end
+            # save the HTML in the local file in /tmp
+            File.open(tmp_path, 'w') { |file| file.write(html) }
+            # create the folder in the cloud and upload the file
+            BlackStack::DropBox.dropbox_create_folder(dropbox_folder)
+            BlackStack::DropBox.dropbox_upload_file(tmp_path, dropbox_path)
+            # delete the local file
+            File.delete(tmp_path)
+            # return the URL of the file in the cloud
+            return BlackStack::DropBox.get_file_url(dropbox_path)
+        end # def zyte_snapshot
+
+    end # class Base
+  end # module Mass
 
   # ----------------------------------------------------------------------------------------- 
   # PRY Supporting Functions

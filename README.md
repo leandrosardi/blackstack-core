@@ -77,12 +77,11 @@ This module is to register the API key and URL of the **my.saas**, where all **m
 ```ruby
 # Setup connection to the API, in order get micro-services requesting and pushing data from/to the my.saas.
 #
-BlackStack::API::set_api_url({
+BlackStack::API::set_client({
   :api_key => '118f3c32-****-****-****-************', 
   :api_protocol => BlackStack.sandbox? ? 'http' : 'https',
   :api_domain => BlackStack.sandbox? ? '127.0.0.1' : 'connectionsphere.com', 
   :api_port => BlackStack.sandbox? ? '3000' : '443',
-  :api_less_secure_port => '3000',
 })
 ```
 
