@@ -6,7 +6,6 @@ module BlackStack
     File.exists?('./.sandbox')
   end
 
-  module BlackStack 
     module API
         @@api_key = nil
         @@api_url = nil
@@ -78,10 +77,7 @@ module BlackStack
         end # def self.post
 
     end # module API
-  end # module Mass
 
-
-  module BlackStack 
     # Base class.
     # List of methods you have to overload if you develop a profile type.
     # 
@@ -290,7 +286,6 @@ module BlackStack
         end # def zyte_snapshot
 
     end # class Base
-  end # module Mass
 
   # ----------------------------------------------------------------------------------------- 
   # PRY Supporting Functions
