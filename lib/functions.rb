@@ -46,7 +46,7 @@ module BlackStack
             api_key: ,
             api_url: ,
             api_version: '1.0',
-            api_port: nil
+            api_port: nil,
             backtrace: false
         )
             @@api_key = api_key
