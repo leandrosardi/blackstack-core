@@ -11,6 +11,7 @@ module BlackStack
         @@api_url = nil
         @@api_port = nil
         @@api_version = '1.0'
+        @@backtrace = false
         @@classes = {}
 
         def self.api_key
@@ -21,13 +22,17 @@ module BlackStack
             @@api_url
         end 
 
-        def self.api_version
-            @@api_version
-        end # def self.api_version
-
         def self.api_port
             @@api_port
         end # def self.api_port
+
+        def self.api_version
+          @@api_version
+        end # def self.api_version
+
+        def self.backtrace
+          @@backtrace
+        end # def self.backtrace
 
         def self.api_url()
             "#{BlackStack::API.api_protocol}://#{BlackStack::API.api_domain}:#{BlackStack::API.api_port}"
@@ -42,11 +47,13 @@ module BlackStack
             api_url: ,
             api_version: '1.0',
             api_port: nil
+            backtrace: false
         )
             @@api_key = api_key
             @@api_url = api_url
             @@api_version = api_version
             @@api_port = api_port
+            @@backtrace = backtrace
         end # def self.set_client
 
         def self.set_server(
@@ -125,7 +132,7 @@ module BlackStack
             params['page'] = page
             params['limit'] = limit
             params['filters'] = filters
-            params['backtrace'] = Mass.backtrace
+            params['backtrace'] = BlackStack::API.backtrace
             # call the API
             ret = BlackStack::API.post(
                 endpoint: "#{self.object_name}/page",
@@ -142,7 +149,7 @@ module BlackStack
         #
         def self.count
             params = {}
-            params['backtrace'] = Mass.backtrace
+            params['backtrace'] = BlackStack::API.backtrace
             ret = BlackStack::API.post(
                 endpoint: "#{self.object_name}/count",
                 params: params
@@ -159,7 +166,7 @@ module BlackStack
         def self.get(id)
             params = {}
             params['id'] = id
-            params['backtrace'] = Mass.backtrace
+            params['backtrace'] = BlackStack::API.backtrace
             ret = BlackStack::API.post(
                 endpoint: "#{self.object_name}/get",
                 params: params
@@ -173,7 +180,7 @@ module BlackStack
         def self.update(desc)
             params = {}
             params['desc'] = desc
-            params['backtrace'] = Mass.backtrace
+            params['backtrace'] = BlackStack::API.backtrace
             ret = BlackStack::API.post(
                 endpoint: "#{self.object_name}/update",
                 params: params
@@ -193,7 +200,7 @@ module BlackStack
         def self.insert(desc)
             params = {}
             params['desc'] = desc
-            params['backtrace'] = Mass.backtrace
+            params['backtrace'] = BlackStack::API.backtrace
             ret = BlackStack::API.post(
                 endpoint: "#{self.object_name}/insert",
                 params: params
@@ -208,7 +215,7 @@ module BlackStack
         def self.upsert(desc)
             params = {}
             params['desc'] = desc
-            params['backtrace'] = Mass.backtrace
+            params['backtrace'] = BlackStack::API.backtrace
             ret = BlackStack::API.post(
                 endpoint: "#{self.object_name}/upsert",
                 params: params
