@@ -189,10 +189,30 @@ module BlackStack
             return self.new(ret['result']).child_class_instance
         end # def self.update
 
+        # Submit a hash descriptor to the server for an update of status only
+        #
+        def self.update_status(desc)
+          params = {}
+          params['desc'] = desc
+          params['backtrace'] = BlackStack::API.backtrace
+          ret = BlackStack::API.post(
+              endpoint: "#{self.object_name}/update_status",
+              params: params
+          )
+          raise "Error calling update_status endpoint: #{ret['status']}" if ret['status'] != 'success'
+          return
+        end # def self.update
+
         # Submit a hash descriptor to the server for an update
         #
         def update
             self.class.update(self.desc)
+        end
+
+        # Submit a hash descriptor to the server for an update of status only
+        #
+        def update_status
+          self.class.update(self.desc)
         end
 
         # Submit a hash descriptor to the server for an insert

@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'blackstack-core'
-  s.version     = '1.2.19'
-  s.date        = '2024-07-26'
+  s.version     = '1.2.20'
+  s.date        = '2024-07-29'
   s.summary     = "Core modules, functions and constants for the BlackStack framework."
   s.description = "Find documentation here: https://github.com/leandrosardi/blackstack-core."
   s.authors     = ["Leandro Daniel Sardi"]
