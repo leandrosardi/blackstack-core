@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'blackstack-core'
-  s.version     = '1.2.20'
-  s.date        = '2024-07-29'
+  s.version     = '1.2.21'
+  s.date        = '2024-07-30'
   s.summary     = "Core modules, functions and constants for the BlackStack framework."
   s.description = "Find documentation here: https://github.com/leandrosardi/blackstack-core."
   s.authors     = ["Leandro Daniel Sardi"]
@@ -20,8 +20,8 @@ Gem::Specification.new do |s|
   ]
   s.homepage    = 'https://rubygems.org/gems/blackstack-core'
   s.license     = 'MIT'
-  s.add_runtime_dependency 'content_spinning', '~> 0.3.1', '>= 0.3.1'
-  s.add_runtime_dependency 'json', '~> 2.6.1', '>= 2.6.1'
-  s.add_runtime_dependency 'pry', '~> 0.14.1', '>= 0.14.1' # this is used to add breakpoints
-  s.add_runtime_dependency 'faraday', '~> 2.3.0', '>= 2.3.0' # this is used to submit complex json structures to access points
+  s.add_runtime_dependency 'content_spinning', '~> 0.3.1'
+  s.add_runtime_dependency 'json', '~> 2.6.1'
+  s.add_runtime_dependency 'pry', '~> 0.14.1' # this is used to add breakpoints
+  s.add_runtime_dependency 'faraday', '~> 2.3.0' # this is used to submit complex json structures to access points
 end
