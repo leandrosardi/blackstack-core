@@ -241,7 +241,7 @@ module BlackStack
                 params: params
             )
             raise "Error calling upsert endpoint: #{ret['status']}" if ret['status'] != 'success'
-            return self.new(ret['result']).child_class_instance
+            return ret['result'] == {} ? nil : self.new(ret['result']).child_class_instance
         end # def self.upsert
 
         # Submit a hash descriptor to the server for an upsert
