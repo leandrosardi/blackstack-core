@@ -56,6 +56,7 @@ module BlackStack
             @@backtrace = backtrace
         end # def self.set_client
 
+        # merge existing classes with new ones.
         def self.set_server(
             classes: {}
         )
