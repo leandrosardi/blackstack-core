@@ -59,7 +59,7 @@ module BlackStack
         def self.set_server(
             classes: {}
         )
-            @@classes = classes
+            @@classes.merge(classes)
         end # def self.set_server
 
         def self.post(
