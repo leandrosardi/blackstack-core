@@ -107,8 +107,11 @@ module BlackStack
             return self
         end
 
-        def self.account_value(field:)
+        # sysowner must provide the id_account for getting an account value.
+        # for non sysowner it is assigned to his account.
+        def self.account_value(field:, id_account:nil)
             params = {}
+            params['id_account'] = id_account
             params['field'] = field
             # call the API
             ret = BlackStack::API.post(
