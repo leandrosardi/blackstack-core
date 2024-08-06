@@ -127,14 +127,16 @@ module BlackStack
         # 
         # Parameters: 
         # - id_account: guid. Id of the account to bring the profiles. Sysowner must provide the id_account for getting an account value. For non sysowner it is assigned to his account.
+        # - promiscuous: boolean. It works only for Sysowner. If true, it will bring all non-deleted rows. If false, it will bring only rows matching id_profile. Default: false.
         # - page: integer. Page number.
         # - limit: integer. Number of profiles per page.
         # - params: hash. Additional filter parameters used by the specific child class.
         #
-        def self.page(id_account: nil, page:, limit:, filters: {})
+        def self.page(id_account: nil, promiscuous: false, page:, limit:, filters: {})
             # add page and limit to the params
             params = {}
             params['id_account'] = id_account
+            params['promiscuous'] = promiscuous
             params['page'] = page
             params['limit'] = limit
             params['filters'] = filters
