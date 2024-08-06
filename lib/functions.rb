@@ -109,7 +109,7 @@ module BlackStack
 
         # sysowner must provide the id_account for getting an account value.
         # for non sysowner it is assigned to his account.
-        def self.account_value(field:, id_account:nil)
+        def self.account_value(id_account:nil, field:)
             params = {}
             params['id_account'] = id_account
             params['field'] = field
@@ -126,13 +126,15 @@ module BlackStack
         # Get array of hash descriptor of profile.
         # 
         # Parameters: 
+        # - id_account: guid. Id of the account to bring the profiles. Sysowner must provide the id_account for getting an account value. For non sysowner it is assigned to his account.
         # - page: integer. Page number.
         # - limit: integer. Number of profiles per page.
         # - params: hash. Additional filter parameters used by the specific child class.
         #
-        def self.page(page:, limit:, filters: {})
+        def self.page(id_account: nil, page:, limit:, filters: {})
             # add page and limit to the params
             params = {}
+            params['id_account'] = id_account
             params['page'] = page
             params['limit'] = limit
             params['filters'] = filters
