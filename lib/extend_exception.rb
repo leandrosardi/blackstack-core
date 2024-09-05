@@ -4,7 +4,7 @@ class Exception
 	end
 
   def to_console(include_backtrace=true)
-    ret = self.to_s 
+    ret = self.message 
     ret += "\r\n" + self.backtrace.join("\r\n") if (include_backtrace == true)
     ret
   end # to_console
