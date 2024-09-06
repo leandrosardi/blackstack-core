@@ -34,10 +34,6 @@ module BlackStack
           @@backtrace
         end # def self.backtrace
 
-        def self.api_url()
-            "#{BlackStack::API.api_protocol}://#{BlackStack::API.api_domain}:#{BlackStack::API.api_port}"
-        end      
-
         def self.classes
             @@classes
         end # def self.classes
