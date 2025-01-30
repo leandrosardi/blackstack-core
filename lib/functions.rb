@@ -935,60 +935,78 @@ module BlackStack
       body = {},
       ssl_verify_mode = BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE,
       support_redirections = true)
-      require 'faraday'
-      require 'faraday_middleware'
 
-      uri = URI.parse(url)
+      max_redirects = 5
+      attempts      = 0
 
-      conn = Faraday.new(
-        url: "#{uri.scheme}://#{uri.host}",
-        ssl: { verify: ssl_verify_mode != OpenSSL::SSL::VERIFY_NONE },
-        request: {
-          open_timeout: DEFAULT_OPEN_TIMEOUT,
-          timeout:      DEFAULT_READ_TIMEOUT,
-        }
-      ) do |f|
-        # Follow HTTP redirects if requested
-        f.response :follow_redirects if support_redirections
+      while attempts < DEFAULT_RETRY_ATTEMPTS
+        begin
+          uri = URI.parse(url)
 
-        # Automatic retry on typical transient failures
-        f.request :retry, max: DEFAULT_RETRY_ATTEMPTS,
-          interval: 1,
-          interval_randomness: 0.5,
-          backoff_factor: 2,
-          exceptions: [
-            Errno::ETIMEDOUT,
-            Timeout::Error,
-            Faraday::ConnectionFailed,
-            Faraday::RetriableResponse,
-            Faraday::ServerError
-          ]
+          # Create a basic Faraday connection
+          conn = Faraday.new(
+            url: "#{uri.scheme}://#{uri.host}", 
+            ssl: { verify: ssl_verify_mode != OpenSSL::SSL::VERIFY_NONE },
+            request: {
+              open_timeout: DEFAULT_OPEN_TIMEOUT,
+              timeout:      DEFAULT_READ_TIMEOUT
+            }
+          ) do |f|
+            f.adapter Faraday.default_adapter
+          end
 
-          # Handle JSON request/response automatically
-          f.request :json
-          f.response :json, content_type: /\bjson$/
+          # Perform the initial POST request
+          response = conn.post(uri.path) do |req|
+            req.body = JSON.generate(body) # Manually serialize to JSON
+            req.headers['Content-Type'] = 'application/json'
+            req.headers['Accept']       = 'application/json'
+          end
 
-          # Choose an adapter (Net::HTTP, etc.)
-          f.adapter Faraday.default_adapter
+          # Manually handle HTTP redirects if requested
+          redirect_count = 0
+          while support_redirections &&
+            response.status.between?(300, 399) &&
+            response.headers['location'] &&
+            redirect_count < max_redirects
+
+            redirect_count += 1
+            new_url = URI.join(url, response.headers['location']).to_s
+
+            # Update `url` for the next iteration
+            url = new_url
+            uri = URI.parse(new_url)
+
+            response = conn.post(uri.path) do |req|
+              req.body = JSON.generate(body)
+              req.headers['Content-Type'] = 'application/json'
+              req.headers['Accept']       = 'application/json'
+            end
+          end
+
+          # Raise an error if the final response is not 2xx
+          unless response.success?
+            raise "HTTP #{response.status}: #{response.body}"
+          end
+
+          # If all is good, return the Faraday response object
+          return response
+
+        rescue Errno::ETIMEDOUT, Timeout::Error, Faraday::ConnectionFailed => e
+          # Basic retry logic for transient network errors
+          attempts += 1
+          if attempts < DEFAULT_RETRY_ATTEMPTS
+            sleep_time = 2**attempts
+            sleep(sleep_time)  # Exponential backoff
+            retry
+          else
+            # Too many failures, re-raise
+            raise e
+          end
+        rescue => e
+          # For any other error, just re-raise
+          raise e
         end
-
-        # Perform the POST request
-        response = conn.post(uri.path) do |req|
-        req.body = body  # Faraday will serialize to JSON because of `f.request :json`
-        req.headers['Content-Type'] = 'application/json'
-        req.headers['Accept']       = 'application/json'
       end
-
-      # Raise an error on non-200/2xx responses
-      unless response.success?
-        raise "HTTP #{response.status}: #{response.body}"
-      end
-
-      # If all is good, return the raw Faraday response object
-      response
-    rescue => e
-      # Reraise or wrap the error as you prefer
-      raise e
     end # def self.call_post
 
     # TODO: deprecated
