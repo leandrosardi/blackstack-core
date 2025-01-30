@@ -862,6 +862,10 @@ module BlackStack
     DEFAULT_SSL_VERIFY_MODE = OpenSSL::SSL::VERIFY_NONE
     SUCCESS = 'success'
 
+    DEFAULT_OPEN_TIMEOUT  = 10    # seconds to wait for the initial connection
+    DEFAULT_READ_TIMEOUT  = 30    # seconds to wait for each response
+    DEFAULT_RETRY_ATTEMPTS = 3
+
     @@lockfiles = []
 
     @@max_api_call_channels = 0 # 0 means infinite
@@ -927,32 +931,65 @@ module BlackStack
     #
     # TODO: parameter support_redirections has been deprecated.
     #
-    def self.call_post(url, body = {}, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, support_redirections=true)
-      # issue: https://github.com/leandrosardi/mysaas/issues/59
-      #
-      # when ruby pushes hash of hashes (or hash of arrays), all values are converted into strings.
-      # and arrays are mapped to the last element only.
-      #
-      # the solution is to convert each element of the hash into a string using `.to_json` method.
-      #
-      # references:
-      # - https://stackoverflow.com/questions/1667630/how-do-i-convert-a-string-object-into-a-hash-object
-      # - https://stackoverflow.com/questions/67572866/how-to-build-complex-json-to-post-to-a-web-service-with-rails-5-2-and-faraday-ge
-      #
-      # iterate the keys of the hash
-      #
-      params = {} # not needed for post calls to access points
-      path = URI::parse(url).path
-      domain = url.gsub(/#{Regexp.escape(path)}/, '')
+    def self.call_post(url,
+      body = {},
+      ssl_verify_mode = BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE,
+      support_redirections = true)
+      require 'faraday'
+      require 'faraday_middleware'
 
-      conn = Faraday.new(domain, :ssl=>{:verify=>ssl_verify_mode!=OpenSSL::SSL::VERIFY_NONE})
-      ret = conn.post(path, params) do |req|
-        req.body = body.to_json
+      uri = URI.parse(url)
+
+      conn = Faraday.new(
+        url: "#{uri.scheme}://#{uri.host}",
+        ssl: { verify: ssl_verify_mode != OpenSSL::SSL::VERIFY_NONE },
+        request: {
+          open_timeout: DEFAULT_OPEN_TIMEOUT,
+          timeout:      DEFAULT_READ_TIMEOUT,
+        }
+      ) do |f|
+        # Follow HTTP redirects if requested
+        f.response :follow_redirects if support_redirections
+
+        # Automatic retry on typical transient failures
+        f.request :retry, max: DEFAULT_RETRY_ATTEMPTS,
+          interval: 1,
+          interval_randomness: 0.5,
+          backoff_factor: 2,
+          exceptions: [
+            Errno::ETIMEDOUT,
+            Timeout::Error,
+            Faraday::ConnectionFailed,
+            Faraday::RetriableResponse,
+            Faraday::ServerError
+          ]
+
+          # Handle JSON request/response automatically
+          f.request :json
+          f.response :json, content_type: /\bjson$/
+
+          # Choose an adapter (Net::HTTP, etc.)
+          f.adapter Faraday.default_adapter
+        end
+
+        # Perform the POST request
+        response = conn.post(uri.path) do |req|
+        req.body = body  # Faraday will serialize to JSON because of `f.request :json`
         req.headers['Content-Type'] = 'application/json'
-        req.headers['Accept'] =  'application/json'
+        req.headers['Accept']       = 'application/json'
       end
-      ret
-    end
+
+      # Raise an error on non-200/2xx responses
+      unless response.success?
+        raise "HTTP #{response.status}: #{response.body}"
+      end
+
+      # If all is good, return the raw Faraday response object
+      response
+    rescue => e
+      # Reraise or wrap the error as you prefer
+      raise e
+    end # def self.call_post
 
     # TODO: deprecated
     def self.api_call(url, params={}, method=BlackStack::Netting::CALL_METHOD_POST, ssl_verify_mode=BlackStack::Netting::DEFAULT_SSL_VERIFY_MODE, max_retries=5)
