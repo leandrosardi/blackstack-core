@@ -941,11 +941,9 @@ module BlackStack
 
       while attempts < DEFAULT_RETRY_ATTEMPTS
         begin
-          uri = URI.parse(url)
-
           # Create a basic Faraday connection
           conn = Faraday.new(
-            url: "#{uri.scheme}://#{uri.host}", 
+            url: url, #"#{uri.scheme}://#{uri.host}:#{uri.port}", 
             ssl: { verify: ssl_verify_mode != OpenSSL::SSL::VERIFY_NONE },
             request: {
               open_timeout: DEFAULT_OPEN_TIMEOUT,
@@ -1018,9 +1016,8 @@ module BlackStack
       while (nTries < max_retries && bSuccess == false)
         begin
           nTries = nTries + 1
-          uri = URI(url)
-          res = BlackStack::Netting::call_post(uri, params, ssl_verify_mode) if method==BlackStack::Netting::CALL_METHOD_POST
-          res = BlackStack::Netting::call_get(uri, params, ssl_verify_mode) if method==BlackStack::Netting::CALL_METHOD_GET
+          res = BlackStack::Netting::call_post(url, params, ssl_verify_mode) if method==BlackStack::Netting::CALL_METHOD_POST
+          res = BlackStack::Netting::call_get(url, params, ssl_verify_mode) if method==BlackStack::Netting::CALL_METHOD_GET
           parsed = JSON.parse(res.body)
           if (parsed['status']==BlackStack::Netting::SUCCESS)
             bSuccess = true

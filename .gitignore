@@ -20,3 +20,5 @@ config.prod.rb
 
 # clients' storage folder
 /public/clients/*/
+
+.sandbox
