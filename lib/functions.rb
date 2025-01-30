@@ -941,6 +941,8 @@ module BlackStack
 
       while attempts < DEFAULT_RETRY_ATTEMPTS
         begin
+          uri = URI.parse(url)
+
           # Create a basic Faraday connection
           conn = Faraday.new(
             url: url, #"#{uri.scheme}://#{uri.host}:#{uri.port}", 
